@@ -1,0 +1,78 @@
+package com.mobitechs.mytaskmanager.util
+
+
+import com.mobitechs.mytaskmanager.model.ApiResponse
+import com.mobitechs.mytaskmanager.model.ForgotPasswordRequest
+import com.mobitechs.mytaskmanager.model.ForgotPasswordResponse
+import com.mobitechs.mytaskmanager.model.LoginRequest
+import com.mobitechs.mytaskmanager.model.MyData
+import com.mobitechs.mytaskmanager.model.MyTeamData
+import com.mobitechs.mytaskmanager.model.SetPasswordRequest
+import com.mobitechs.mytaskmanager.model.TaskRequest
+import com.mobitechs.mytaskmanager.model.TaskResponse
+import com.mobitechs.mytaskmanager.model.TeamMemberRequestAdd
+import com.mobitechs.mytaskmanager.model.TeamMemberResponse
+import com.mobitechs.mytaskmanager.model.TeamRequestAddEdit
+import com.mobitechs.mytaskmanager.model.TeamRequestDelete
+import com.mobitechs.mytaskmanager.model.TeamResponse
+import com.mobitechs.mytaskmanager.model.UserRequest
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+
+interface ApiService {
+    @POST("userRegister")
+    suspend fun userRegister(@Body user: UserRequest): ApiResponse
+
+    @POST("userLogin")
+    suspend fun userLogin(@Body login: LoginRequest): ApiResponse
+
+    @POST("forgotPassword")
+    suspend fun forgotPassword(@Body forgotPasswordRequest: ForgotPasswordRequest): ForgotPasswordResponse
+
+    @POST("setPassword")
+    suspend fun setPassword(@Body setPasswordRequest: SetPasswordRequest): ApiResponse
+
+    @POST("addTask")
+    suspend fun addTask(@Body task: TaskRequest): ApiResponse
+
+    @GET("getTaskListAssignedToMe/{userId}")
+    suspend fun getTasksAssignedToMe(@Path("userId") userId: String): TaskResponse
+
+
+//    team Details
+    @POST("createTeam")
+    suspend fun createTeam(@Body team: TeamRequestAddEdit): ApiResponse
+
+    @POST("editTeam")
+    suspend fun editTeam(@Body team: TeamRequestAddEdit): ApiResponse
+
+    @POST("deleteTeam")
+    suspend fun deleteTeam(@Body team: TeamRequestDelete): ApiResponse
+
+    @POST("getTeamList")
+    suspend fun getTeams(@Body team: MyData): TeamResponse
+
+    @POST("getTeamMembers")
+    suspend fun getTeamMembers(@Body team: MyTeamData): TeamMemberResponse
+
+    @POST("addTeamMember")
+    suspend fun addTeamMember(@Body team: TeamMemberRequestAdd): ApiResponse
+
+    @POST("deleteTeamMember")
+    suspend fun deleteTeamMember(@Body team: TeamMemberRequestAdd): ApiResponse
+
+    @POST("getUserList")
+    suspend fun getUserList(@Body team: MyData): ApiResponse
+}
+
+object RetrofitClient {
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://mobitechs.in/MyTaskMangerAPI/api/") // Replace with your API base URL
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val apiService: ApiService = retrofit.create(ApiService::class.java)
+}
