@@ -1,6 +1,7 @@
 package com.mobitechs.mytaskmanager.team
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -151,14 +153,15 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                     title = { Text("Add Team Member") },
                     text = {
                         Column {
-                            BasicTextField(
+                            Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.weight(1f))
+                            OutlinedTextField(
                                 value = searchQuery,
                                 onValueChange = {
                                     searchQuery = it
-//                                    viewModel.searchMembers(it) { response ->
-//                                        memberList = response ?: emptyList()
-//                                    }
-
+//                                  viewModel.getUserList(MyData(userId)) { response ->
+//                                      response?.let { memberList = it.data ?: emptyList() }
+//                                  }
                                     viewModel.getUserList(MyData(userId)) { response ->
                                         isLoading = false
                                         response?.let {
@@ -171,16 +174,35 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                         }
                                     }
                                 },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
+                                label = { Text("Search Members") },
+                                modifier = Modifier.fillMaxWidth()
                             )
+
                             LazyColumn {
                                 items(memberList) { member ->
+                                    val isAlreadyAdded = teamMembers.any { it.userId == member.userId.toString() }
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(8.dp),
+                                            .padding(8.dp)
+                                            .clickable(enabled = !isAlreadyAdded) {
+                                                viewModel.addTeamMember(
+                                                    TeamMemberRequestAdd(team.value.teamId, member.userId.toString(), userId)
+                                                ) { response ->
+                                                    response?.let {
+                                                        ShowToast(context, it.message)
+                                                        if (it.statusCode == 200) {
+//                                                        navController.navigate("homeScreen")
+                                                            navController.popBackStack()
+                                                        } else {
+                                                            errorMessage = it.message
+                                                        }
+                                                    } ?: run {
+                                                        errorMessage = "Unexpected error occurred"
+                                                        ShowToast(context, errorMessage!!)
+                                                    }
+                                                }
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Image(
@@ -189,68 +211,22 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                             modifier = Modifier.size(40.dp)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(member.name, fontSize = 16.sp, color = Color.Black)
+                                        Text(
+                                            member.name,
+                                            fontSize = 16.sp,
+                                            color = if (isAlreadyAdded) Color.Gray else Color.Black
+                                        )
                                         Spacer(modifier = Modifier.weight(1f))
-                                        Button(onClick = {
-                                            //selectedMember = member
-
-                                            viewModel.addTeamMember(
-                                                TeamMemberRequestAdd(
-                                                    team.value.teamId,
-                                                    member.userId.toString(), userId
-                                                )
-                                            ) { response ->
-                                                isLoading = false
-                                                response?.let {
-                                                    ShowToast(context, it.message)
-                                                    if (it.statusCode == 200) {
-//                                                        navController.navigate("homeScreen")
-                                                        navController.popBackStack()
-                                                    } else {
-                                                        errorMessage = it.message
-                                                    }
-                                                } ?: run {
-                                                    errorMessage = "Unexpected error occurred"
-                                                    ShowToast(context, errorMessage!!)
-                                                }
-                                            }
-                                        }) {
-                                            Text("Select")
+                                        if (isAlreadyAdded) {
+                                            Icon(Icons.Default.Check, contentDescription = "Already Added", tint = Color.Gray)
                                         }
+
                                     }
                                 }
                             }
                         }
                     },
                     confirmButton = {
-//                        Button(onClick = {
-//                            selectedMember?.let {
-////                                viewModel.addTeamMember(TeamMemberRequestAdd(team.value.teamId, it.userId,userId))
-////                                showSearch = false
-//
-//                                viewModel.addTeamMember(
-//                                    TeamMemberRequestAdd(
-//                                        team.value.teamId,
-//                                        it.userId.toString(), userId
-//                                    )
-//                                ) { response ->
-//                                    isLoading = false
-//                                    response?.let {
-//                                        ShowToast(context, it.message)
-//                                        if (it.statusCode == 200) {
-//                                            navController.navigate("homeScreen")
-//                                        } else {
-//                                            errorMessage = it.message
-//                                        }
-//                                    } ?: run {
-//                                        errorMessage = "Unexpected error occurred"
-//                                        ShowToast(context, errorMessage!!)
-//                                    }
-//                                }
-//                            }
-//                        }) {
-//                            Text("Add Member")
-//                        }
                     },
                     dismissButton = {
                         Button(onClick = { showSearch = false }) {
