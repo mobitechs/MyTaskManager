@@ -1,8 +1,4 @@
-package com.mobitechs.mytaskmanager.screen.task
-
-
-
-
+package com.mobitechs.mytaskmanager.screen.taskAssignedMe
 
 
 import androidx.compose.foundation.*
@@ -32,7 +28,7 @@ import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
-fun TaskListScreen(navController: NavController) {
+fun TaskAssignedMeScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: ViewModelTask = viewModel()
     var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }
@@ -45,7 +41,7 @@ fun TaskListScreen(navController: NavController) {
     val userId = user.value?.userId.toString()
 
     LaunchedEffect(Unit) {
-        viewModel.getTaskListAssignedByMe(MyData(userId)) { response ->
+        viewModel.getTaskListAssignedToMe(MyData(userId)) { response ->
             isLoading = false
             response?.let {
                 if (it.statusCode == 200) {

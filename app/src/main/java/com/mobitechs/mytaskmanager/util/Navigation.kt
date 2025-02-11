@@ -9,6 +9,8 @@ import androidx.navigation.navArgument
 import com.mobitechs.mytaskmanager.ForgotPasswordScreen
 import com.mobitechs.mytaskmanager.screen.HomeScreen
 import com.mobitechs.mytaskmanager.screen.SplashScreen
+import com.mobitechs.mytaskmanager.screen.task.TaskListScreen
+import com.mobitechs.mytaskmanager.screen.taskAssignedMe.TaskAssignedMeScreen
 import com.mobitechs.mytaskmanager.screen.user.LoginScreen
 import com.mobitechs.mytaskmanager.screen.user.RegisterScreen
 import com.mobitechs.mytaskmanager.screen.user.SetPasswordScreen
@@ -22,6 +24,8 @@ fun AppNavigation(viewModel: ViewModelUser) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "splashScreen") {
         composable("splashScreen") { SplashScreen(navController) }
+        composable("taskListScreen") { TaskListScreen(navController) }
+        composable("taskAssignedMeScreen") { TaskAssignedMeScreen(navController) }
         composable("loginScreen") { LoginScreen(navController, viewModel) }
         composable("registerScreen") { RegisterScreen(navController, viewModel) }
         composable("forgotPasswordScreen") { ForgotPasswordScreen(navController, viewModel) }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.model.ApiResponse
+import com.mobitechs.mytaskmanager.model.TaskResponse
 import com.mobitechs.mytaskmanager.model.TeamMemberResponse
 import com.mobitechs.mytaskmanager.model.TeamResponse
 import com.mobitechs.mytaskmanager.model.UserData
@@ -113,6 +114,17 @@ fun handleHttpException3(e: HttpException): TeamMemberResponse {
         "Unexpected error occurred"
     }
     return TeamMemberResponse(e.code(), "error", errorMessage, null)
+}
+fun handleHttpExceptionTask(e: HttpException): TaskResponse {
+    val errorBody = e.response()?.errorBody()?.string()
+    val errorMessage = try {
+        val jsonObject = JSONObject(errorBody ?: "{}")
+        jsonObject.getString("message")
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+        "Unexpected error occurred"
+    }
+    return TaskResponse(e.code(), "error", errorMessage, null)
 }
 
 

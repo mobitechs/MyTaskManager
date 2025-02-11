@@ -67,6 +67,12 @@ interface ApiService {
 
     @POST("getUserList")
     suspend fun getUserList(@Body team: MyData): ApiResponse
+
+    @POST("getTaskListAssignedToMe")
+    suspend fun getTaskListAssignedToMe(@Body team: MyData): TaskResponse
+
+    @POST("getTaskListAssignedByMe")
+    suspend fun getTaskListAssignedByMe(@Body team: MyData): TaskResponse
 }
 
 object RetrofitClient {

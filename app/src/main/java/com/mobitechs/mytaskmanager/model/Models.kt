@@ -40,10 +40,16 @@ data class UserData(
 data class MyData(val userId: String)
 
 data class TaskRequest(val taskName: String, val taskDescription: String, val kpi: String, val ownerId: String, val assigneeId: String, val teamId: String, val expectedDate: String, val status: String, val updatedBy: String)
-data class TaskResponse(val success: Boolean, val message: String, val tasks: List<Task>?)
-data class Task(val id: String, val name: String, val description: String, val status: String)
+//data class TaskResponse(val success: Boolean, val message: String, val tasks: List<Task>?)
+//data class Task(val id: String, val name: String, val description: String, val status: String)
 
-
+data class TaskResponse(
+    val statusCode: Int,
+    val status: String,
+    val message: String,
+    val data: List<TaskDetails>?
+)
+data class TaskDetails(val taskId: String, val taskName: String, val taskDescription: String, val expectedDate: String,val status: String, val kpi: String, val noOfReminder: String, val comment: String,val assigneeName: String, val assigneeEmail: String, val assigneePhone: String, val ownerName: String, val ownerEmail: String, val ownerPhone: String, val teamId: String, val teamName: String, val teamDescription: String)
 
 
 

@@ -119,7 +119,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(icon = { Icon(Icons.Default.List, contentDescription = "My Task") },
             label = { Text("My Task") },
             selected = false,
-            onClick = { navController.navigate("myTaskScreen") })
+            onClick = { navController.navigate("taskListScreen") })
 
         BottomNavigationItem(icon = {
             Icon(
@@ -129,7 +129,7 @@ fun BottomNavigationBar(navController: NavController) {
         },
             label = { Text("Assigned Task") },
             selected = false,
-            onClick = { navController.navigate("assignedTaskScreen") })
+            onClick = { navController.navigate("taskAssignedMeScreen") })
 
         BottomNavigationItem(icon = {
             Icon(
