@@ -1,6 +1,7 @@
 package com.mobitechs.mytaskmanager.screen
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -90,7 +91,7 @@ fun HomeScreen(navController: NavController) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addTaskScreen") },
+                onClick = {  navController.navigate("taskAddScreen/${Uri.encode("null")}") },
                 shape = CircleShape
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Task")
@@ -116,18 +117,18 @@ fun BottomNavigationBar(navController: NavController) {
             selected = false,
             onClick = { navController.navigate("homeScreen") })
 
-        BottomNavigationItem(icon = { Icon(Icons.Default.List, contentDescription = "My Task") },
-            label = { Text("My Task") },
+        BottomNavigationItem(icon = { Icon(Icons.Default.Send, contentDescription = "Delegated") },
+            label = { Text("Delegated") },
             selected = false,
             onClick = { navController.navigate("taskListScreen") })
 
         BottomNavigationItem(icon = {
             Icon(
-                Icons.Default.Send,
-                contentDescription = "Assigned Task"
+                Icons.Default.List,
+                contentDescription = "For Me"
             )
         },
-            label = { Text("Assigned Task") },
+            label = { Text("For Me") },
             selected = false,
             onClick = { navController.navigate("taskAssignedMeScreen") })
 

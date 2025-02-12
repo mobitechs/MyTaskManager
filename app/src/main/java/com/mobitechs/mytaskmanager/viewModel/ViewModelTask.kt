@@ -7,30 +7,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobitechs.mytaskmanager.model.ApiResponse
 import com.mobitechs.mytaskmanager.model.MyData
-import com.mobitechs.mytaskmanager.model.MyTeamData
+import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
+import com.mobitechs.mytaskmanager.model.TaskRequestComment
+import com.mobitechs.mytaskmanager.model.TaskRequestDelete
+import com.mobitechs.mytaskmanager.model.TaskRequestReminder
+import com.mobitechs.mytaskmanager.model.TaskRequestStatus
 import com.mobitechs.mytaskmanager.model.TaskResponse
-import com.mobitechs.mytaskmanager.model.TeamDetails
-import com.mobitechs.mytaskmanager.model.TeamMemberRequestAdd
-import com.mobitechs.mytaskmanager.model.TeamMemberResponse
-import com.mobitechs.mytaskmanager.model.TeamRequestAddEdit
-import com.mobitechs.mytaskmanager.model.TeamRequestDelete
 import com.mobitechs.mytaskmanager.model.TeamResponse
 import com.mobitechs.mytaskmanager.util.RetrofitClient
 import com.mobitechs.mytaskmanager.util.handleHttpException
 import com.mobitechs.mytaskmanager.util.handleHttpException2
-import com.mobitechs.mytaskmanager.util.handleHttpException3
 import com.mobitechs.mytaskmanager.util.handleHttpExceptionTask
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class ViewModelTask : ViewModel() {
 
     var response by mutableStateOf("")
-
-
-
 
 
     fun getTaskListAssignedToMe(
@@ -75,26 +68,6 @@ class ViewModelTask : ViewModel() {
         }
     }
 
-    fun fetchTeamsMembers(
-        myData: MyTeamData,
-        onResponse: (TeamMemberResponse?) -> Unit
-    ) {
-        viewModelScope.launch {
-            try {
-                val res = RetrofitClient.apiService.getTeamMembers(myData)
-                if (res.statusCode == 200) {
-                    response = res.message
-                }
-                onResponse(res)
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                onResponse(handleHttpException3(e))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onResponse(TeamMemberResponse(500, "error", "Unexpected error occurred", null))
-            }
-        }
-    }
 
     fun getUserList(
         myData: MyData,
@@ -117,15 +90,35 @@ class ViewModelTask : ViewModel() {
         }
     }
 
+    fun fetchTeams(
+        myData: MyData,
+        onResponse: (TeamResponse?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val res = RetrofitClient.apiService.getTeams(myData)
+                if (res.statusCode == 200) {
+                    response = res.message
+                }
+                onResponse(res)
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                onResponse(handleHttpException2(e))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResponse(TeamResponse(500, "error", "Unexpected error occurred", null))
+            }
+        }
+    }
 
 
-    fun addTeam(
-        teamReq: TeamRequestAddEdit,
+    fun addTask(
+        teamReq: TaskRequestAddEdit,
         onResponse: (ApiResponse?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val res = RetrofitClient.apiService.createTeam(teamReq)
+                val res = RetrofitClient.apiService.addTask(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }
@@ -138,13 +131,13 @@ class ViewModelTask : ViewModel() {
         }
     }
 
-    fun editTeam(
-        teamReq: TeamRequestAddEdit,
+    fun editTask(
+        teamReq: TaskRequestAddEdit,
         onResponse: (ApiResponse?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val res = RetrofitClient.apiService.editTeam(teamReq)
+                val res = RetrofitClient.apiService.editTask(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }
@@ -157,13 +150,13 @@ class ViewModelTask : ViewModel() {
         }
     }
 
-    fun deleteTeam(
-        teamReq: TeamRequestDelete,
+    fun deleteTask(
+        teamReq: TaskRequestDelete,
         onResponse: (ApiResponse?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val res = RetrofitClient.apiService.deleteTeam(teamReq)
+                val res = RetrofitClient.apiService.deleteTask(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }
@@ -176,14 +169,13 @@ class ViewModelTask : ViewModel() {
         }
     }
 
-
-    fun addTeamMember(
-        teamReq: TeamMemberRequestAdd,
+    fun updateStatus(
+        teamReq: TaskRequestStatus,
         onResponse: (ApiResponse?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val res = RetrofitClient.apiService.addTeamMember(teamReq)
+                val res = RetrofitClient.apiService.updateStatus(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }
@@ -196,13 +188,13 @@ class ViewModelTask : ViewModel() {
         }
     }
 
-    fun deleteTeamMember(
-        teamReq: TeamMemberRequestAdd,
+    fun addReminderForTask(
+        teamReq: TaskRequestReminder,
         onResponse: (ApiResponse?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val res = RetrofitClient.apiService.deleteTeamMember(teamReq)
+                val res = RetrofitClient.apiService.addReminderForTask(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }
@@ -215,6 +207,43 @@ class ViewModelTask : ViewModel() {
         }
     }
 
+    fun addComment(
+        teamReq: TaskRequestComment,
+        onResponse: (ApiResponse?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val res = RetrofitClient.apiService.addComment(teamReq)
+                if (res.statusCode == 200) {
+                    response = res.message
+                }
+                onResponse(res)
+            } catch (e: HttpException) {
+                onResponse(handleHttpException(e))
+            } catch (e: Exception) {
+                onResponse(ApiResponse(500, "error", "Unexpected error occurred", null))
+            }
+        }
+    }
+
+    fun editComment(
+        teamReq: TaskRequestComment,
+        onResponse: (ApiResponse?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val res = RetrofitClient.apiService.editComment(teamReq)
+                if (res.statusCode == 200) {
+                    response = res.message
+                }
+                onResponse(res)
+            } catch (e: HttpException) {
+                onResponse(handleHttpException(e))
+            } catch (e: Exception) {
+                onResponse(ApiResponse(500, "error", "Unexpected error occurred", null))
+            }
+        }
+    }
 
 
 }

@@ -39,9 +39,25 @@ data class UserData(
 
 data class MyData(val userId: String)
 
-data class TaskRequest(val taskName: String, val taskDescription: String, val kpi: String, val ownerId: String, val assigneeId: String, val teamId: String, val expectedDate: String, val status: String, val updatedBy: String)
-//data class TaskResponse(val success: Boolean, val message: String, val tasks: List<Task>?)
-//data class Task(val id: String, val name: String, val description: String, val status: String)
+//Task Details
+data class TaskRequestAddEdit(
+    val taskId: String,
+    val taskName: String,
+    val taskDescription: String,
+    val kpi: String,
+    val ownerId: String,
+    val assigneeId: String,
+    val teamId: String,
+    val expectedDate: String,
+    val status: String,
+    val updatedBy: String
+)
+
+data class TaskRequestDelete(val taskId: String, val updatedBy: String)
+data class TaskRequestStatus(val taskId: String, val status: String, val updatedBy: String)
+data class TaskRequestReminder(val taskId: String, val noOfReminder: String, val updatedBy: String)
+data class TaskRequestComment(val taskId: String, val comment: String, val expectedDate: String, val updatedBy: String)
+
 
 data class TaskResponse(
     val statusCode: Int,

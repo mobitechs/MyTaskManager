@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.mobitechs.mytaskmanager.ForgotPasswordScreen
 import com.mobitechs.mytaskmanager.screen.HomeScreen
 import com.mobitechs.mytaskmanager.screen.SplashScreen
+import com.mobitechs.mytaskmanager.screen.task.TaskAddScreen
 import com.mobitechs.mytaskmanager.screen.task.TaskListScreen
 import com.mobitechs.mytaskmanager.screen.taskAssignedMe.TaskAssignedMeScreen
 import com.mobitechs.mytaskmanager.screen.user.LoginScreen
@@ -36,7 +37,6 @@ fun AppNavigation(viewModel: ViewModelUser) {
         }
         composable("homeScreen") { HomeScreen(navController) }
         composable("teamLisScreen") { TeamListScreen(navController) }
-//        composable("teamAddScreen") { TeamAddScreen(navController) }
 
         composable(
             "teamAddScreen/{teamJson}",
@@ -60,6 +60,20 @@ fun AppNavigation(viewModel: ViewModelUser) {
             val teamJson = backStackEntry.arguments?.getString("teamJson")
             TeamDetailsScreen(navController, teamJson)
         }
+
+
+
+        composable(
+            "taskAddScreen/{taskJson}",
+            arguments = listOf(navArgument("taskJson") {
+                type = NavType.StringType
+                defaultValue = "null" // Handle null case
+            })
+        ) { backStackEntry ->
+            val teamJson = backStackEntry.arguments?.getString("taskJson")
+            TaskAddScreen(navController, teamJson)
+        }
+
 
 
     }

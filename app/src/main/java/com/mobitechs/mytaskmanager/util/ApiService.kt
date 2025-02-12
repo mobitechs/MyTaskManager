@@ -8,7 +8,11 @@ import com.mobitechs.mytaskmanager.model.LoginRequest
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.MyTeamData
 import com.mobitechs.mytaskmanager.model.SetPasswordRequest
-import com.mobitechs.mytaskmanager.model.TaskRequest
+import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
+import com.mobitechs.mytaskmanager.model.TaskRequestComment
+import com.mobitechs.mytaskmanager.model.TaskRequestDelete
+import com.mobitechs.mytaskmanager.model.TaskRequestReminder
+import com.mobitechs.mytaskmanager.model.TaskRequestStatus
 import com.mobitechs.mytaskmanager.model.TaskResponse
 import com.mobitechs.mytaskmanager.model.TeamMemberRequestAdd
 import com.mobitechs.mytaskmanager.model.TeamMemberResponse
@@ -36,11 +40,10 @@ interface ApiService {
     @POST("setPassword")
     suspend fun setPassword(@Body setPasswordRequest: SetPasswordRequest): ApiResponse
 
-    @POST("addTask")
-    suspend fun addTask(@Body task: TaskRequest): ApiResponse
 
-    @GET("getTaskListAssignedToMe/{userId}")
-    suspend fun getTasksAssignedToMe(@Path("userId") userId: String): TaskResponse
+
+//    @GET("getTaskListAssignedToMe/{userId}")
+//    suspend fun getTasksAssignedToMe(@Path("userId") userId: String): TaskResponse
 
 
 //    team Details
@@ -68,11 +71,40 @@ interface ApiService {
     @POST("getUserList")
     suspend fun getUserList(@Body team: MyData): ApiResponse
 
+
+// task Details
+
     @POST("getTaskListAssignedToMe")
     suspend fun getTaskListAssignedToMe(@Body team: MyData): TaskResponse
 
     @POST("getTaskListAssignedByMe")
     suspend fun getTaskListAssignedByMe(@Body team: MyData): TaskResponse
+
+    @POST("addTask")
+    suspend fun addTask(@Body task: TaskRequestAddEdit): ApiResponse
+
+    @POST("editTask")
+    suspend fun editTask(@Body task: TaskRequestAddEdit): ApiResponse
+
+    @POST("deleteTask")
+    suspend fun deleteTask(@Body task: TaskRequestDelete): ApiResponse
+
+    @POST("updateStatus")
+    suspend fun updateStatus(@Body task: TaskRequestStatus): ApiResponse
+
+    @POST("addReminderForTask")
+    suspend fun addReminderForTask(@Body task: TaskRequestReminder): ApiResponse
+
+    @POST("addComment")
+    suspend fun addComment(@Body task: TaskRequestComment): ApiResponse
+
+    @POST("editComment")
+    suspend fun editComment(@Body task: TaskRequestComment): ApiResponse
+
+
+
+
+
 }
 
 object RetrofitClient {
