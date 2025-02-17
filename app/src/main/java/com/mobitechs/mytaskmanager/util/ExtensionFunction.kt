@@ -43,7 +43,7 @@ import java.util.Locale
 val statusOptions = listOf(
     TaskStatus(1, "To Do"),
     TaskStatus(2, "Reopened"),
-    TaskStatus(3, "In Progress"),
+    TaskStatus(3, "WIP"),
     TaskStatus(4, "Completed"),
     TaskStatus(5, "Cancelled")
 )

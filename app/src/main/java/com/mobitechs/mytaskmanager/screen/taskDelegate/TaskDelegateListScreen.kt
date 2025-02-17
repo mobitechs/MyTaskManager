@@ -1,19 +1,46 @@
 package com.mobitechs.mytaskmanager.screen.taskDelegate
 
 import android.app.DatePickerDialog
-import android.net.Uri
 import android.content.Context
-import androidx.compose.foundation.background
+import android.net.Uri
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,7 +60,9 @@ import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Locale
 
 @Composable
 fun TaskDelegateListScreen(navController: NavController) {
@@ -79,34 +108,34 @@ fun TaskDelegateListScreen(navController: NavController) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Filter Menu")
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                        DropdownMenuItem(onClick = { selectedTeam = "All"; filteredTasks = taskList }) {
+                        DropdownMenuItem(onClick = {
+                            selectedTeam = "All"; filteredTasks = taskList
+                        }) {
                             Text("Show All Teams")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "To Do";
-//                            refreshAPITrigger++
-                            filteredTasks =  taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.status == selectedStatus }
                         }
                         ) {
                             Text("To Do Tasks")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "Reopened";
-//                            refreshAPITrigger++
-                            filteredTasks =  taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.status == selectedStatus }
                         }
                         ) {
                             Text("Reopened Tasks")
                         }
                         DropdownMenuItem(onClick = {
-                            selectedStatus = "In Progress";
-                            filteredTasks =  taskList.filter { it.status == selectedStatus }
+                            selectedStatus = "WIP";
+                            filteredTasks = taskList.filter { it.status == selectedStatus }
                         }) {
-                            Text("In Progress Tasks")
+                            Text("WIP Tasks")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "Completed";
-                            filteredTasks =  taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.status == selectedStatus }
                         }) {
                             Text("Completed Tasks")
                         }
@@ -122,7 +151,9 @@ fun TaskDelegateListScreen(navController: NavController) {
             ) { Icon(Icons.Default.Add, contentDescription = "Add Task") }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
 
             SearchBar(
                 searchQuery, taskList, selectedDate,
@@ -137,7 +168,8 @@ fun TaskDelegateListScreen(navController: NavController) {
                 },
                 onDateSelect = { date ->
                     selectedDate = date
-                    filteredTasks = if (date == "All") taskList else taskList.filter { it.expectedDate == date }
+                    filteredTasks =
+                        if (date == "All") taskList else taskList.filter { it.expectedDate == date }
                 }
             )
 
@@ -173,13 +205,18 @@ fun TaskDelegateListScreen(navController: NavController) {
                 }
             }
 
-            TaskListView(navController, filteredTasks, viewModel, userId, context) { refreshAPITrigger++ }
+            TaskListView(
+                navController,
+                filteredTasks,
+                viewModel,
+                userId,
+                context
+            ) { refreshAPITrigger++ }
         }
     }
 }
 
 // Search Bar with Date Filter
-
 @Composable
 fun SearchBar(
     searchQuery: TextFieldValue,
@@ -263,7 +300,9 @@ fun TaskListView(
     context: Context,
     refreshList: () -> Unit
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
         items(tasks) { task ->
             TaskCard(task, navController, viewModel, userId, context, refreshList)
         }
@@ -285,8 +324,8 @@ fun TaskCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navController.navigate("taskDetailsScreen/${Gson().toJson(task)}") },
-        elevation = 4.dp
+//            .clickable { navController.navigate("taskDetailsScreen/${Gson().toJson(task)}") }
+            ,elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -310,12 +349,20 @@ fun TaskCard(
                     IconButton(onClick = {
                         navController.navigate("taskAddScreen/${Gson().toJson(task)}")
                     }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit Task", tint = Color.Blue)
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit Task",
+                            tint = Color.Blue
+                        )
                     }
 
                     // 🗑 Delete Button
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete Task", tint = Color.Red)
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete Task",
+                            tint = Color.Red
+                        )
                     }
                 }
             }
