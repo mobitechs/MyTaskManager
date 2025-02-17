@@ -1,7 +1,5 @@
 package com.mobitechs.mytaskmanager.screen.taskDelegate
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -31,22 +27,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
+import com.mobitechs.mytaskmanager.components.DatePickerButton
+import com.mobitechs.mytaskmanager.components.DropdownField
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
 import com.mobitechs.mytaskmanager.model.TeamDetails
 import com.mobitechs.mytaskmanager.model.UserData
 import com.mobitechs.mytaskmanager.util.ShowToast
+import com.mobitechs.mytaskmanager.util.formatDateTime
 import com.mobitechs.mytaskmanager.util.getUserFromSession
+import com.mobitechs.mytaskmanager.util.statusOptions
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
 fun TaskAddScreen(navController: NavController, taskJson: String?) {
+//To Do / Reopened / In Progress / Completed / Cancelled
+
     val context = LocalContext.current
 
     val viewModel: ViewModelTask = viewModel()
@@ -61,10 +65,12 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 taskName = "",
                 taskDescription = "",
                 expectedDate = "",
-                status = "",
+                deadlineDate = "",
+                status = "To Do",
                 kpi = "",
                 noOfReminder = "",
                 comment = "",
+                assigneeId="",
                 assigneeName = "",
                 assigneeEmail = "",
                 assigneePhone = "",
@@ -73,11 +79,21 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 ownerPhone = "",
                 teamId = "",
                 teamName = "",
-                teamDescription = ""
+                teamDescription = "",
+                createdAt = ""
             )
         )
     }
 
+    var taskName by remember { mutableStateOf(taskDetails.value.taskName) }
+    var taskDescription by remember { mutableStateOf(taskDetails.value.taskDescription) }
+    var kpi by remember { mutableStateOf(taskDetails.value.kpi) }
+    var selectedTeamId by remember { mutableStateOf(taskDetails.value.teamId) }
+    var selectedTeamName by remember { mutableStateOf(taskDetails.value.teamName) }
+    var selectedAssigneeId by remember { mutableStateOf(taskDetails.value.assigneeId) }
+    var selectedAssigneeName by remember { mutableStateOf(taskDetails.value.assigneeName) }
+    var expectedDate by remember { mutableStateOf(taskDetails.value.expectedDate) }
+    var status by remember { mutableStateOf(taskDetails.value.status) }
 
     var isLoading by remember { mutableStateOf(true) }
     var teams by remember { mutableStateOf<List<TeamDetails>>(emptyList()) }
@@ -114,13 +130,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
         }
     }
 
-    var taskName by remember { mutableStateOf("") }
-    var taskDescription by remember { mutableStateOf("") }
-    var kpi by remember { mutableStateOf("") }
-    var selectedTeamId by remember { mutableStateOf("") }
-    var selectedAssigneeId by remember { mutableStateOf("") }
-    var expectedDate by remember { mutableStateOf("") }
-    var status by remember { mutableStateOf("") }
+
 
 
 
@@ -130,7 +140,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 title = { Text(if (isEditMode) "Edit Task" else "Add Task") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                          Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 })
         }
@@ -167,37 +177,64 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            DropdownMenuBox(
-                "Select Team",
-                teams.map { it.teamId to it.teamName },
-                selectedTeamId
-            ) { teamId ->
-                selectedTeamId = teamId
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            DropdownMenuBox(
-                "Select Assignee",
-                users.map { it.userId.toString() to it.name },
-                selectedAssigneeId
-            ) { userId ->
-                selectedAssigneeId = userId
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = expectedDate,
-                onValueChange = { expectedDate = it },
-                label = { Text("Expected Date") },
-                modifier = Modifier.fillMaxWidth()
+            DropdownField(
+                label = "Select Team",
+                options = teams.map { it.teamName },
+                selectedOption = selectedTeamName,
+                onOptionSelected = { selectedName ->
+                    selectedTeamName = selectedName
+                    selectedTeamId =
+                        (teams.firstOrNull { it.teamName == selectedName }?.teamId
+                            ?: "").toString()
+                },
+                context = context
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = status,
-                onValueChange = { status = it },
-                label = { Text("Status") },
+
+            DropdownField(
+                label = "Select Assignee",
+                options = users.map { it.name },
+                selectedOption = selectedAssigneeName,
+                onOptionSelected = { selectedName ->
+
+                    selectedAssigneeName = selectedName
+                    selectedAssigneeId =
+                        (users.firstOrNull { it.name == selectedName }?.userId
+                            ?: "").toString()
+                },
+                context = context
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                "Expected Date:",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = Color.Black,
                 modifier = Modifier.fillMaxWidth()
+            )
+            DatePickerButton(
+                selectedDate = expectedDate,
+                onDateSelected = { newDate -> expectedDate = newDate }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            DropdownField(
+                label = "Status",
+//                        options = statusOptions.map { it.id.toString() to it.name },
+                options = statusOptions.map { it.name },
+                selectedOption = status,
+                onOptionSelected = { selectedName ->
+                    status = selectedName
+//                            if you want id then uncomment this code and also do this
+//                            selectedCategoryId =
+//                                (categoryList.firstOrNull { it.categoryName == selectedName }?.categoryId
+//                                    ?: "").toString()
+                },
+                context = context
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -285,32 +322,6 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
     }
 
 
+
 }
 
-@Composable
-fun DropdownMenuBox(
-    label: String,
-    items: List<Pair<String, String>>,
-    selectedValue: String,
-    onSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var displayText by remember { mutableStateOf(label) }
-
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = true }) {
-        Text(text = displayText, modifier = Modifier.padding(16.dp))
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            items.forEach { (id, name) ->
-                DropdownMenuItem(onClick = {
-                    onSelected(id)
-                    displayText = name
-                    expanded = false
-                }) {
-                    Text(text = name)
-                }
-            }
-        }
-    }
-}

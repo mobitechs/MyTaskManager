@@ -42,10 +42,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.components.ConfirmationDialog
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TeamDetails
 import com.mobitechs.mytaskmanager.model.TeamRequestDelete
-import com.mobitechs.mytaskmanager.util.ConfirmationDialog
 import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTeam
@@ -63,9 +63,9 @@ fun TeamListScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var teamDetails by remember { mutableStateOf<TeamDetails?>(null) }
+    var refreshAPITrigger by remember { mutableStateOf(0) }
 
-
-    LaunchedEffect(userId) {
+    LaunchedEffect(refreshAPITrigger) {
         if (userId != "") {
             viewModel.fetchTeams(MyData(userId)) { response ->
                 isLoading = false
@@ -205,6 +205,7 @@ fun TeamListScreen(navController: NavController) {
                                 ) { response ->
                                     isLoading = false
                                     response?.let {
+                                        refreshAPITrigger++
                                         ShowToast(context, it.message)
                                     } ?: run {
                                         errorMessage = "Unexpected error occurred"

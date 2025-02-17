@@ -1,6 +1,7 @@
 package com.mobitechs.mytaskmanager.screen.taskForMe
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
@@ -50,6 +52,7 @@ fun TaskForMeScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showSortOptions by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf("None") }
+
 
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
@@ -129,7 +132,7 @@ fun TaskForMeScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(16.dp)) {
                     items(taskList) { task ->
-                        TaskItem(task)
+                        TaskItem(task,navController)
                     }
                 }
             }
@@ -138,11 +141,20 @@ fun TaskForMeScreen(navController: NavController) {
 }
 
 @Composable
-fun TaskItem(task: TaskDetails) {
+fun TaskItem(task: TaskDetails, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                navController.navigate(
+                    "taskForMeDetailsScreen/${
+                        Gson().toJson(
+                            task
+                        )
+                    }"
+                )
+            },
         shape = RoundedCornerShape(12.dp),
         elevation = 6.dp,
         backgroundColor = Color(0xFFE3F2FD)
@@ -161,7 +173,7 @@ fun TaskItem(task: TaskDetails) {
                 modifier = Modifier.padding(top = 4.dp)
             )
             Text(
-                text = "Due: ${task.expectedDate}",
+                text = "Expected: ${task.expectedDate}",
                 fontSize = 12.sp,
                 color = Color.Red,
                 modifier = Modifier.padding(top = 4.dp)

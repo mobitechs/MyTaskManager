@@ -2,7 +2,9 @@ package com.mobitechs.mytaskmanager.screen.taskDelegate
 
 
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
@@ -23,6 +24,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,9 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.components.ConfirmationDialog
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
+import com.mobitechs.mytaskmanager.model.TaskRequestDelete
+import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
@@ -49,16 +56,21 @@ import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 fun TaskDelegateListScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: ViewModelTask = viewModel()
-    var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }
+
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showSortOptions by remember { mutableStateOf(false) }
-    var sortOption by remember { mutableStateOf("None") }
+    var refreshAPITrigger by remember { mutableStateOf(0) }
+
+    var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var taskDetails by remember { mutableStateOf<TaskDetails?>(null) }
+
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshAPITrigger) {
         viewModel.getTaskListAssignedByMe(MyData(userId)) { response ->
             isLoading = false
             response?.let {
@@ -99,103 +111,156 @@ fun TaskDelegateListScreen(navController: NavController) {
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
-            if (showSortOptions) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(onClick = {
-                        sortOption = "Date"
-                        taskList = taskList.sortedBy { it.expectedDate }
-                        showSortOptions = false
-                    }) {
-                        Text("Sort by Date")
-                    }
-                    Button(onClick = {
-                        sortOption = "Status"
-                        taskList = taskList.sortedBy { it.status }
-                        showSortOptions = false
-                    }) {
-                        Text("Sort by Status")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            when {
+                isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
                 }
-            }
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (errorMessage != null) {
-                Text(
-                    text = errorMessage!!,
-                    color = Color.Red,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(16.dp)
-                )
-            } else {
-                LazyColumn(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)) {
-                    items(taskList) { task ->
-                        TaskItem(task)
+
+                errorMessage != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(errorMessage!!, fontSize = 18.sp, color = Color.Red)
+                    }
+                }
+
+                taskList.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Task not available", fontSize = 18.sp, color = Color.Gray)
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        items(taskList) { task ->
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            "taskDetailsScreen/${
+                                                Gson().toJson(
+                                                    task
+                                                )
+                                            }"
+                                        )
+                                    },
+
+                                elevation = 4.dp
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = task.taskName,
+                                        fontSize = 20.sp,
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = task.taskDescription,
+                                        fontSize = 14.sp,
+                                        color = Color.DarkGray,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                    Text(
+                                        text = "Due: ${task.expectedDate}",
+                                        fontSize = 12.sp,
+                                        color = Color.Red,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                    Text(
+                                        text = "Status: ${task.status}",
+                                        fontSize = 12.sp,
+                                        color = Color.Blue,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                    Text(
+                                        text = "Assigned to: ${task.assigneeName}",
+                                        fontSize = 12.sp,
+                                        color = Color.Black,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                    Text(
+                                        text = "Team: ${task.teamName}",
+                                        fontSize = 12.sp,
+                                        color = Color.Magenta,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        IconButton(onClick = {
+                                            navController.navigate(
+                                                "taskAddScreen/${
+                                                    Gson().toJson(
+                                                        task
+                                                    )
+                                                }"
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Default.Edit,
+                                                contentDescription = "Edit Task",
+                                                tint = Color.Blue
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            taskDetails = task
+                                            showDeleteDialog = true
+
+                                        }) {
+                                            Icon(
+                                                Icons.Default.Delete,
+                                                contentDescription = "Delete Task",
+                                                tint = Color.Red
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (showDeleteDialog) {
+                        ConfirmationDialog(
+                            title = "Delete Task",
+                            message = "Are you sure you want to delete this Task?",
+                            confirmButtonText = "Delete",
+                            cancelButtonText = "Cancel",
+                            onConfirm = {
+                                viewModel.deleteTask(
+                                    TaskRequestDelete(
+                                        taskDetails!!.taskId,
+                                        userId
+                                    )
+                                ) { response ->
+                                    isLoading = false
+                                    response?.let {
+                                        refreshAPITrigger++
+                                        ShowToast(context, it.message)
+                                    } ?: run {
+                                        errorMessage = "Unexpected error occurred"
+                                        ShowToast(context, errorMessage!!)
+                                    }
+                                }
+                            },
+                            onCancel = { showDeleteDialog = false },
+                            isDialogVisible = true,
+                            onDismiss = { showDeleteDialog = false }
+                        )
                     }
                 }
             }
         }
     }
 }
-
-@Composable
-fun TaskItem(task: TaskDetails) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = 6.dp,
-        backgroundColor = Color(0xFFE3F2FD)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = task.taskName,
-                fontSize = 20.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = task.taskDescription,
-                fontSize = 14.sp,
-                color = Color.DarkGray,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = "Due: ${task.expectedDate}",
-                fontSize = 12.sp,
-                color = Color.Red,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = "Status: ${task.status}",
-                fontSize = 12.sp,
-                color = Color.Blue,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = "Assigned by: ${task.ownerName}",
-                fontSize = 12.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = "Team: ${task.teamName}",
-                fontSize = 12.sp,
-                color = Color.Magenta,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-    }
-}
-

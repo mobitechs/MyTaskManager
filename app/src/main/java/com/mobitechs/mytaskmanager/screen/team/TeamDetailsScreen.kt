@@ -70,11 +70,12 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
     var showSearch by remember { mutableStateOf(false) }
     var selectedMember by remember { mutableStateOf<UserData?>(null) }
     var memberList by remember { mutableStateOf<List<UserData>>(emptyList()) }
+    var refreshAPITrigger by remember { mutableStateOf(0) }
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
 
-    LaunchedEffect(team.value.teamId) {
+    LaunchedEffect(refreshAPITrigger,team.value.teamId) {
         viewModel.fetchTeamsMembers(MyTeamData(team.value.teamId)) { response ->
             isLoading = false
             response?.let {
@@ -153,9 +154,10 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                     ) { response ->
                                         isLoading = false
                                         response?.let {
-                                            teamMembers = teamMembers.toMutableList().apply {
-                                                removeIf { it.userId == member.userId }
-                                            }
+//                                            teamMembers = teamMembers.toMutableList().apply {
+//                                                removeIf { it.userId == member.userId }
+//                                            }
+                                            refreshAPITrigger++
                                             ShowToast(context, it.message)
                                         } ?: run {
                                             errorMessage = "Unexpected error occurred"
@@ -225,8 +227,7 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                                     response?.let {
                                                         ShowToast(context, it.message)
                                                         if (it.statusCode == 200) {
-//                                                        navController.navigate("homeScreen")
-                                                            navController.popBackStack()
+                                                            refreshAPITrigger++
                                                         } else {
                                                             errorMessage = it.message
                                                         }

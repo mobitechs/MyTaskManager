@@ -1,3 +1,7 @@
 package com.mobitechs.mytaskmanager.util
 
-class Constant
+import com.mobitechs.mytaskmanager.model.TaskStatus
+
+class Constant{
+
+}

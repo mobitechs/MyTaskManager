@@ -12,6 +12,7 @@ import com.mobitechs.mytaskmanager.model.TaskRequestComment
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
 import com.mobitechs.mytaskmanager.model.TaskRequestReminder
 import com.mobitechs.mytaskmanager.model.TaskRequestStatus
+import com.mobitechs.mytaskmanager.model.TaskRequestUpdate
 import com.mobitechs.mytaskmanager.model.TaskResponse
 import com.mobitechs.mytaskmanager.model.TeamResponse
 import com.mobitechs.mytaskmanager.util.RetrofitClient
@@ -233,6 +234,25 @@ class ViewModelTask : ViewModel() {
         viewModelScope.launch {
             try {
                 val res = RetrofitClient.apiService.editComment(teamReq)
+                if (res.statusCode == 200) {
+                    response = res.message
+                }
+                onResponse(res)
+            } catch (e: HttpException) {
+                onResponse(handleHttpException(e))
+            } catch (e: Exception) {
+                onResponse(ApiResponse(500, "error", "Unexpected error occurred", null))
+            }
+        }
+    }
+
+    fun updateTaskDetails(
+        teamReq: TaskRequestUpdate,
+        onResponse: (ApiResponse?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val res = RetrofitClient.apiService.updateTaskDetails(teamReq)
                 if (res.statusCode == 200) {
                     response = res.message
                 }

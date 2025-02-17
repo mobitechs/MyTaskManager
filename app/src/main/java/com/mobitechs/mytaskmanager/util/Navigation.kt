@@ -11,6 +11,7 @@ import com.mobitechs.mytaskmanager.screen.HomeScreen
 import com.mobitechs.mytaskmanager.screen.SplashScreen
 import com.mobitechs.mytaskmanager.screen.taskDelegate.TaskAddScreen
 import com.mobitechs.mytaskmanager.screen.taskDelegate.TaskDelegateListScreen
+import com.mobitechs.mytaskmanager.screen.taskForMe.TaskForMeDetailsScreen
 import com.mobitechs.mytaskmanager.screen.taskForMe.TaskForMeScreen
 import com.mobitechs.mytaskmanager.screen.user.LoginScreen
 import com.mobitechs.mytaskmanager.screen.user.RegisterScreen
@@ -59,6 +60,17 @@ fun AppNavigation(viewModel: ViewModelUser) {
         ) { backStackEntry ->
             val teamJson = backStackEntry.arguments?.getString("teamJson")
             TeamDetailsScreen(navController, teamJson)
+        }
+
+        composable(
+            "taskForMeDetailsScreen/{taskJson}",
+            arguments = listOf(navArgument("taskJson") {
+                type = NavType.StringType
+                defaultValue = "null" // Handle null case
+            })
+        ) { backStackEntry ->
+            val taskJson = backStackEntry.arguments?.getString("taskJson")
+            TaskForMeDetailsScreen(navController, taskJson)
         }
 
 

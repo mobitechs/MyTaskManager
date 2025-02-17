@@ -56,13 +56,22 @@ data class TaskRequestAddEdit(
 data class TaskRequestDelete(val taskId: String, val updatedBy: String)
 data class TaskRequestStatus(val taskId: String, val status: String, val updatedBy: String)
 data class TaskRequestReminder(val taskId: String, val noOfReminder: String, val updatedBy: String)
+
 data class TaskRequestComment(
     val taskId: String,
     val comment: String,
     val expectedDate: String,
     val updatedBy: String
 )
+data class TaskRequestUpdate(
+    val taskId: String,
+    val status: String,
+    val comment: String,
+    val deadlineDate: String,
+    val updatedBy: String
+)
 
+data class TaskStatus(val id: Int, val name: String)
 
 data class TaskResponse(
     val statusCode: Int,
@@ -76,10 +85,12 @@ data class TaskDetails(
     val taskName: String,
     val taskDescription: String,
     val expectedDate: String,
+    val deadlineDate: String,
     val status: String,
     val kpi: String,
     val noOfReminder: String,
     val comment: String,
+    val assigneeId: String,
     val assigneeName: String,
     val assigneeEmail: String,
     val assigneePhone: String,
@@ -88,7 +99,8 @@ data class TaskDetails(
     val ownerPhone: String,
     val teamId: String,
     val teamName: String,
-    val teamDescription: String
+    val teamDescription: String,
+    val createdAt: String
 )
 
 

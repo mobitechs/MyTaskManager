@@ -13,6 +13,7 @@ import com.mobitechs.mytaskmanager.model.TaskRequestComment
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
 import com.mobitechs.mytaskmanager.model.TaskRequestReminder
 import com.mobitechs.mytaskmanager.model.TaskRequestStatus
+import com.mobitechs.mytaskmanager.model.TaskRequestUpdate
 import com.mobitechs.mytaskmanager.model.TaskResponse
 import com.mobitechs.mytaskmanager.model.TeamMemberRequestAdd
 import com.mobitechs.mytaskmanager.model.TeamMemberResponse
@@ -86,17 +87,22 @@ interface ApiService {
     @POST("deleteTask")
     suspend fun deleteTask(@Body task: TaskRequestDelete): ApiResponse
 
-    @POST("updateStatus")
-    suspend fun updateStatus(@Body task: TaskRequestStatus): ApiResponse
+
 
     @POST("addReminderForTask")
     suspend fun addReminderForTask(@Body task: TaskRequestReminder): ApiResponse
+
+    @POST("updateStatus")
+    suspend fun updateStatus(@Body task: TaskRequestStatus): ApiResponse
 
     @POST("addComment")
     suspend fun addComment(@Body task: TaskRequestComment): ApiResponse
 
     @POST("editComment")
     suspend fun editComment(@Body task: TaskRequestComment): ApiResponse
+
+    @POST("updateTaskDetails")
+    suspend fun updateTaskDetails(@Body task: TaskRequestUpdate): ApiResponse
 
 
 }
