@@ -64,7 +64,7 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
 
     val task = remember { Gson().fromJson(taskJson, TaskDetails::class.java) }
     var selectedStatus by remember { mutableStateOf(task.status) }
-    var selectedDeadlineDate by remember { mutableStateOf(formatDateTime(task.deadlineDate)) }
+    var selectedDeadlineDate by remember { mutableStateOf(task.deadlineDate) }
     var commentText by remember { mutableStateOf(task.comment) }
 
     var isLoading by remember { mutableStateOf(false) }
