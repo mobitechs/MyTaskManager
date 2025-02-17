@@ -1,4 +1,4 @@
-package com.mobitechs.mytaskmanager.screen.task
+package com.mobitechs.mytaskmanager.screen.taskDelegate
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

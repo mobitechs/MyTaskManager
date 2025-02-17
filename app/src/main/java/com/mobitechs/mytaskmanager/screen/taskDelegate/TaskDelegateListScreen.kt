@@ -1,4 +1,4 @@
-package com.mobitechs.mytaskmanager.screen.task
+package com.mobitechs.mytaskmanager.screen.taskDelegate
 
 
 import android.net.Uri
@@ -22,7 +22,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
@@ -47,7 +46,7 @@ import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
-fun TaskListScreen(navController: NavController) {
+fun TaskDelegateListScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: ViewModelTask = viewModel()
     var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }

@@ -9,15 +9,15 @@ import androidx.navigation.navArgument
 import com.mobitechs.mytaskmanager.ForgotPasswordScreen
 import com.mobitechs.mytaskmanager.screen.HomeScreen
 import com.mobitechs.mytaskmanager.screen.SplashScreen
-import com.mobitechs.mytaskmanager.screen.task.TaskAddScreen
-import com.mobitechs.mytaskmanager.screen.task.TaskListScreen
-import com.mobitechs.mytaskmanager.screen.taskAssignedMe.TaskAssignedMeScreen
+import com.mobitechs.mytaskmanager.screen.taskDelegate.TaskAddScreen
+import com.mobitechs.mytaskmanager.screen.taskDelegate.TaskDelegateListScreen
+import com.mobitechs.mytaskmanager.screen.taskForMe.TaskForMeScreen
 import com.mobitechs.mytaskmanager.screen.user.LoginScreen
 import com.mobitechs.mytaskmanager.screen.user.RegisterScreen
 import com.mobitechs.mytaskmanager.screen.user.SetPasswordScreen
-import com.mobitechs.mytaskmanager.team.TeamAddScreen
-import com.mobitechs.mytaskmanager.team.TeamDetailsScreen
-import com.mobitechs.mytaskmanager.team.TeamListScreen
+import com.mobitechs.mytaskmanager.screen.team.TeamAddScreen
+import com.mobitechs.mytaskmanager.screen.team.TeamDetailsScreen
+import com.mobitechs.mytaskmanager.screen.team.TeamListScreen
 import com.mobitechs.mytaskmanager.viewModel.ViewModelUser
 
 @Composable
@@ -25,8 +25,8 @@ fun AppNavigation(viewModel: ViewModelUser) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "splashScreen") {
         composable("splashScreen") { SplashScreen(navController) }
-        composable("taskListScreen") { TaskListScreen(navController) }
-        composable("taskAssignedMeScreen") { TaskAssignedMeScreen(navController) }
+        composable("taskDelegateListScreen") { TaskDelegateListScreen(navController) }
+        composable("taskForMeScreen") { TaskForMeScreen(navController) }
         composable("loginScreen") { LoginScreen(navController, viewModel) }
         composable("registerScreen") { RegisterScreen(navController, viewModel) }
         composable("forgotPasswordScreen") { ForgotPasswordScreen(navController, viewModel) }

@@ -1,4 +1,4 @@
-package com.mobitechs.mytaskmanager.screen.taskAssignedMe
+package com.mobitechs.mytaskmanager.screen.taskForMe
 
 
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +42,7 @@ import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
-fun TaskAssignedMeScreen(navController: NavController) {
+fun TaskForMeScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: ViewModelTask = viewModel()
     var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }

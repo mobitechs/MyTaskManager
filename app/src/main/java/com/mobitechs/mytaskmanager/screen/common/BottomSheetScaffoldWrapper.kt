@@ -27,13 +27,13 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(icon = {
             Icon(
                 Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Delegated"
+                contentDescription = "Delegate Task"
             )
         },
-            label = { Text("Delegated") },
+            label = { Text("Delegate") },
 //            selected = false,
-            selected = currentRoute == "taskListScreen",
-            onClick = { navController.navigate("taskListScreen") })
+            selected = currentRoute == "taskDelegateListScreen",
+            onClick = { navController.navigate("taskDelegateListScreen") })
 
         BottomNavigationItem(icon = {
             Icon(
@@ -43,8 +43,8 @@ fun BottomNavigationBar(navController: NavController) {
         },
             label = { Text("For Me") },
 //            selected = false,
-            selected = currentRoute == "taskAssignedMeScreen",
-            onClick = { navController.navigate("taskAssignedMeScreen") })
+            selected = currentRoute == "taskForMeScreen",
+            onClick = { navController.navigate("taskForMeScreen") })
 
         BottomNavigationItem(icon = {
             Icon(

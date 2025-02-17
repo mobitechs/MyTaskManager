@@ -1,4 +1,4 @@
-package com.mobitechs.mytaskmanager.team
+package com.mobitechs.mytaskmanager.screen.team
 
 
 import android.net.Uri
