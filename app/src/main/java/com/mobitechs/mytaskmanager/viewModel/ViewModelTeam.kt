@@ -1,7 +1,6 @@
 package com.mobitechs.mytaskmanager.viewModel
 
 
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,9 +34,6 @@ class ViewModelTeam : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
-
-
-
 
 
     fun fetchTeams(
@@ -102,7 +98,6 @@ class ViewModelTeam : ViewModel() {
             }
         }
     }
-
 
 
     fun addTeam(
@@ -200,7 +195,6 @@ class ViewModelTeam : ViewModel() {
             }
         }
     }
-
 
 
 }

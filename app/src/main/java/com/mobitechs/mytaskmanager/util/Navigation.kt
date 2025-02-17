@@ -33,7 +33,7 @@ fun AppNavigation(viewModel: ViewModelUser) {
         composable("setPasswordScreen/{email}/{otp}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             val otp = backStackEntry.arguments?.getString("otp") ?: ""
-            SetPasswordScreen(navController, viewModel, email,otp)
+            SetPasswordScreen(navController, viewModel, email, otp)
         }
         composable("homeScreen") { HomeScreen(navController) }
         composable("teamLisScreen") { TeamListScreen(navController) }
@@ -73,7 +73,6 @@ fun AppNavigation(viewModel: ViewModelUser) {
             val teamJson = backStackEntry.arguments?.getString("taskJson")
             TaskAddScreen(navController, teamJson)
         }
-
 
 
     }

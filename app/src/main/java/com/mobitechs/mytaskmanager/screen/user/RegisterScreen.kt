@@ -3,11 +3,27 @@ package com.mobitechs.mytaskmanager.screen.user
 import android.content.Context
 import android.util.Patterns
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,11 +77,26 @@ fun RegisterScreen(navController: NavController, viewModel: ViewModelUser) {
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = phone, onValueChange = { phone = it }, label = { Text("Phone") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+                TextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Phone") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (isLoading) {
@@ -77,27 +108,37 @@ fun RegisterScreen(navController: NavController, viewModel: ViewModelUser) {
                                 name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() -> {
                                     errorMessage = "All fields are required"
                                 }
+
                                 !isValidEmail(email) -> {
                                     errorMessage = "Invalid email address"
                                 }
+
                                 !isValidPhone(phone) -> {
                                     errorMessage = "Invalid phone number"
                                 }
+
                                 else -> {
                                     isLoading = true
-                                    viewModel.userRegister(UserRequest(name, email, phone, password)) {
+                                    viewModel.userRegister(
+                                        UserRequest(
+                                            name,
+                                            email,
+                                            phone,
+                                            password
+                                        )
+                                    ) {
                                         isLoading = false
                                         if (it?.statusCode == 200) {
 
-                                            sessionUserObject(context,it.data)
+                                            sessionUserObject(context, it.data)
 
                                             successMessage = it.message
-                                            ShowToast(context,successMessage)
+                                            ShowToast(context, successMessage)
                                             navController.navigate("home")
                                         } else {
                                             errorMessage = it?.message ?: "Unknown error"
                                             successMessage = ""
-                                            ShowToast(context,"Registration Failed: $errorMessage")
+                                            ShowToast(context, "Registration Failed: $errorMessage")
                                         }
                                     }
                                 }

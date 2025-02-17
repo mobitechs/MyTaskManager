@@ -23,9 +23,7 @@ import com.mobitechs.mytaskmanager.model.UserRequest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface ApiService {
     @POST("userRegister")
@@ -41,12 +39,11 @@ interface ApiService {
     suspend fun setPassword(@Body setPasswordRequest: SetPasswordRequest): ApiResponse
 
 
-
 //    @GET("getTaskListAssignedToMe/{userId}")
 //    suspend fun getTasksAssignedToMe(@Path("userId") userId: String): TaskResponse
 
 
-//    team Details
+    //    team Details
     @POST("createTeam")
     suspend fun createTeam(@Body team: TeamRequestAddEdit): ApiResponse
 
@@ -100,9 +97,6 @@ interface ApiService {
 
     @POST("editComment")
     suspend fun editComment(@Body task: TaskRequestComment): ApiResponse
-
-
-
 
 
 }

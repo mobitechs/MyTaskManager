@@ -2,18 +2,42 @@ package com.mobitechs.mytaskmanager.team
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.*
+import androidx.compose.material.primarySurface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,7 +91,7 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
         topBar = {
             TopAppBar(title = { Text(team.value.teamName) }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
             }, backgroundColor = MaterialTheme.colors.primarySurface)
         },
@@ -77,9 +101,11 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -90,9 +116,11 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                     fontSize = 16.sp,
                     modifier = Modifier.padding(16.dp)
                 )
-                LazyColumn(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
                     items(teamMembers) { member ->
                         Card(
                             modifier = Modifier
@@ -169,7 +197,7 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                                 memberList = it.data ?: emptyList()
                                             } else {
                                                 errorMessage = it.message
-                                                ShowToast(context,errorMessage!!)
+                                                ShowToast(context, errorMessage!!)
                                             }
                                         }
                                     }
@@ -180,14 +208,19 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
 
                             LazyColumn {
                                 items(memberList) { member ->
-                                    val isAlreadyAdded = teamMembers.any { it.userId == member.userId.toString() }
+                                    val isAlreadyAdded =
+                                        teamMembers.any { it.userId == member.userId.toString() }
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(8.dp)
                                             .clickable(enabled = !isAlreadyAdded) {
                                                 viewModel.addTeamMember(
-                                                    TeamMemberRequestAdd(team.value.teamId, member.userId.toString(), userId)
+                                                    TeamMemberRequestAdd(
+                                                        team.value.teamId,
+                                                        member.userId.toString(),
+                                                        userId
+                                                    )
                                                 ) { response ->
                                                     response?.let {
                                                         ShowToast(context, it.message)
@@ -218,7 +251,11 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         if (isAlreadyAdded) {
-                                            Icon(Icons.Default.Check, contentDescription = "Already Added", tint = Color.Gray)
+                                            Icon(
+                                                Icons.Default.Check,
+                                                contentDescription = "Already Added",
+                                                tint = Color.Gray
+                                            )
                                         }
 
                                     }

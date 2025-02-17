@@ -1,29 +1,44 @@
 package com.mobitechs.mytaskmanager.screen.taskAssignedMe
 
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil3.compose.rememberAsyncImagePainter
-import com.google.gson.Gson
-import com.mobitechs.mytaskmanager.model.*
-import com.mobitechs.mytaskmanager.util.ShowToast
+import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.model.MyData
+import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
@@ -36,6 +51,7 @@ fun TaskAssignedMeScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showSortOptions by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf("None") }
+
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
@@ -57,23 +73,30 @@ fun TaskAssignedMeScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text("Assigned Tasks") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
+//                navigationIcon = {
+//                    IconButton(onClick = { navController.popBackStack() }) {
+//                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+//                    }
+//                },
                 actions = {
                     IconButton(onClick = { showSortOptions = !showSortOptions }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Sort Options")
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigationBar(navController)
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             if (showSortOptions) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = {
@@ -98,10 +121,14 @@ fun TaskAssignedMeScreen(navController: NavController) {
                 Text(
                     text = errorMessage!!,
                     color = Color.Red,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp)
                 )
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                LazyColumn(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)) {
                     items(taskList) { task ->
                         TaskItem(task)
                     }
@@ -114,18 +141,50 @@ fun TaskAssignedMeScreen(navController: NavController) {
 @Composable
 fun TaskItem(task: TaskDetails) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = 6.dp,
         backgroundColor = Color(0xFFE3F2FD)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = task.taskName, fontSize = 20.sp, color = Color.Black, fontWeight = FontWeight.Bold)
-            Text(text = task.taskDescription, fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp))
-            Text(text = "Due: ${task.expectedDate}", fontSize = 12.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp))
-            Text(text = "Status: ${task.status}", fontSize = 12.sp, color = Color.Blue, modifier = Modifier.padding(top = 4.dp))
-            Text(text = "Assigned by: ${task.ownerName}", fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(top = 4.dp))
-            Text(text = "Team: ${task.teamName}", fontSize = 12.sp, color = Color.Magenta, modifier = Modifier.padding(top = 4.dp))
+            Text(
+                text = task.taskName,
+                fontSize = 20.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = task.taskDescription,
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Due: ${task.expectedDate}",
+                fontSize = 12.sp,
+                color = Color.Red,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Status: ${task.status}",
+                fontSize = 12.sp,
+                color = Color.Blue,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Assigned by: ${task.ownerName}",
+                fontSize = 12.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Team: ${task.teamName}",
+                fontSize = 12.sp,
+                color = Color.Magenta,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

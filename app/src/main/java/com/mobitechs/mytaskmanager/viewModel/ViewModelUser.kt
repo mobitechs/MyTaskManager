@@ -74,7 +74,10 @@ class ViewModelUser : ViewModel() {
 //        }
 //    }
 
-    fun forgotPassword(forgotPasswordRequest: ForgotPasswordRequest, onResponse: (ForgotPasswordResponse?) -> Unit) {
+    fun forgotPassword(
+        forgotPasswordRequest: ForgotPasswordRequest,
+        onResponse: (ForgotPasswordResponse?) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val res = RetrofitClient.apiService.forgotPassword(forgotPasswordRequest)

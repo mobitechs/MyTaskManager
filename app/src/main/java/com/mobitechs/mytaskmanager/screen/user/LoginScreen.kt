@@ -4,11 +4,27 @@ package com.mobitechs.mytaskmanager.screen.user
 import android.content.Context
 import android.util.Patterns
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +48,8 @@ fun LoginScreen(navController: NavController, viewModel: ViewModelUser) {
 
 
     fun isValidLoginId(loginId: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(loginId).matches() || (loginId.length in 10..15 && loginId.all { it.isDigit() })
+        return Patterns.EMAIL_ADDRESS.matcher(loginId)
+            .matches() || (loginId.length in 10..15 && loginId.all { it.isDigit() })
     }
 
     Box(
@@ -54,9 +71,19 @@ fun LoginScreen(navController: NavController, viewModel: ViewModelUser) {
             ) {
                 Text("Login", fontSize = 24.sp, color = Color(0xFF6200EE))
                 Spacer(modifier = Modifier.height(16.dp))
-                TextField(value = emailPhone, onValueChange = { emailPhone = it }, label = { Text("Email or Phone No") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
+                TextField(
+                    value = emailPhone,
+                    onValueChange = { emailPhone = it },
+                    label = { Text("Email or Phone No") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (isLoading) {
@@ -68,24 +95,31 @@ fun LoginScreen(navController: NavController, viewModel: ViewModelUser) {
                                 emailPhone.isEmpty() || password.isEmpty() -> {
                                     errorMessage = "Email and password are required"
                                 }
+
                                 !isValidLoginId(emailPhone) -> {
                                     errorMessage = "Enter a valid Email or Phone Number"
                                 }
+
                                 else -> {
                                     isLoading = true
-                                    viewModel.userLogin(LoginRequest(emailPhone, password)) { response ->
+                                    viewModel.userLogin(
+                                        LoginRequest(
+                                            emailPhone,
+                                            password
+                                        )
+                                    ) { response ->
                                         isLoading = false
                                         response?.let {
-                                            ShowToast(context,it.message)
+                                            ShowToast(context, it.message)
                                             if (it.statusCode == 200) {
-                                                sessionUserObject(context,it.data)
+                                                sessionUserObject(context, it.data)
                                                 navController.navigate("homeScreen")
                                             } else {
                                                 errorMessage = it.message
                                             }
                                         } ?: run {
                                             errorMessage = "Unexpected error occurred"
-                                            ShowToast(context,errorMessage)
+                                            ShowToast(context, errorMessage)
                                         }
                                     }
                                 }

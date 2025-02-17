@@ -2,12 +2,29 @@ package com.mobitechs.mytaskmanager.team
 
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +46,14 @@ fun TeamAddScreen(navController: NavController, teamJson: String?) {
     val context = LocalContext.current
     val viewModel: ViewModelTeam = viewModel()
     val isEditMode = teamJson != "null" && teamJson != null
-    val teamDetails = remember { mutableStateOf(if (isEditMode) Gson().fromJson(teamJson, TeamDetails::class.java) else TeamDetails(teamId = "", teamName = "", description = "", image = "")) }
+    val teamDetails = remember {
+        mutableStateOf(
+            if (isEditMode) Gson().fromJson(
+                teamJson,
+                TeamDetails::class.java
+            ) else TeamDetails(teamId = "", teamName = "", description = "", image = "")
+        )
+    }
 
     var teamName by remember { mutableStateOf(teamDetails.value.teamName) }
     var description by remember { mutableStateOf(teamDetails.value.description) }
@@ -43,15 +67,20 @@ fun TeamAddScreen(navController: NavController, teamJson: String?) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(if (isEditMode) "Edit Team" else "Add Team") }, navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            })
+            TopAppBar(
+                title = { Text(if (isEditMode) "Edit Team" else "Add Team") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                })
         }
     ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
@@ -93,7 +122,15 @@ fun TeamAddScreen(navController: NavController, teamJson: String?) {
                         } else {
                             isLoading = true
                             if (isEditMode) {
-                                viewModel.editTeam(TeamRequestAddEdit(teamDetails.value.teamId,teamName, description, imageUri.toString(),userId)) { response ->
+                                viewModel.editTeam(
+                                    TeamRequestAddEdit(
+                                        teamDetails.value.teamId,
+                                        teamName,
+                                        description,
+                                        imageUri.toString(),
+                                        userId
+                                    )
+                                ) { response ->
                                     isLoading = false
                                     response?.let {
                                         ShowToast(context, it.message)
@@ -110,7 +147,15 @@ fun TeamAddScreen(navController: NavController, teamJson: String?) {
                                 }
 
                             } else {
-                                viewModel.addTeam(TeamRequestAddEdit("",teamName, description, imageUri.toString(),userId)) { response ->
+                                viewModel.addTeam(
+                                    TeamRequestAddEdit(
+                                        "",
+                                        teamName,
+                                        description,
+                                        imageUri.toString(),
+                                        userId
+                                    )
+                                ) { response ->
                                     isLoading = false
                                     response?.let {
                                         ShowToast(context, it.message)

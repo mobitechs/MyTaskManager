@@ -18,8 +18,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
-
 //userRegister(name,email,phone,password)
 //userLogin(loginId,password)
 //forgotPassword(email)

@@ -30,7 +30,7 @@ import retrofit2.HttpException
 import java.util.Calendar
 
 
-fun sessionUserObject(context:Context, userData: List<UserData>?) {
+fun sessionUserObject(context: Context, userData: List<UserData>?) {
     val sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
     val userJson = Gson().toJson(userData)
     sharedPreferences.edit().putString("user", userJson).apply()
@@ -115,6 +115,7 @@ fun handleHttpException3(e: HttpException): TeamMemberResponse {
     }
     return TeamMemberResponse(e.code(), "error", errorMessage, null)
 }
+
 fun handleHttpExceptionTask(e: HttpException): TaskResponse {
     val errorBody = e.response()?.errorBody()?.string()
     val errorMessage = try {
@@ -126,8 +127,6 @@ fun handleHttpExceptionTask(e: HttpException): TaskResponse {
     }
     return TaskResponse(e.code(), "error", errorMessage, null)
 }
-
-
 
 
 fun ShowToast(context: Context, msg: String) {
@@ -159,7 +158,7 @@ fun DropdownField(
     options: List<String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit,
-    context: android.content.Context
+    context: Context
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -168,7 +167,9 @@ fun DropdownField(
         onExpandedChange = { isExpanded = !isExpanded }
     ) {
         TextField(
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
             value = selectedOption,
             onValueChange = {},
             readOnly = true,

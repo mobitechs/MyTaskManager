@@ -2,7 +2,7 @@ package com.mobitechs.mytaskmanager.model
 
 data class UserRequest(val name: String, val email: String, val phone: String, val password: String)
 data class LoginRequest(val loginId: String, val password: String)
-data class SetPasswordRequest(val email: String,val otp: String, val password: String)
+data class SetPasswordRequest(val email: String, val otp: String, val password: String)
 data class ForgotPasswordRequest(val email: String)
 
 
@@ -56,7 +56,12 @@ data class TaskRequestAddEdit(
 data class TaskRequestDelete(val taskId: String, val updatedBy: String)
 data class TaskRequestStatus(val taskId: String, val status: String, val updatedBy: String)
 data class TaskRequestReminder(val taskId: String, val noOfReminder: String, val updatedBy: String)
-data class TaskRequestComment(val taskId: String, val comment: String, val expectedDate: String, val updatedBy: String)
+data class TaskRequestComment(
+    val taskId: String,
+    val comment: String,
+    val expectedDate: String,
+    val updatedBy: String
+)
 
 
 data class TaskResponse(
@@ -65,22 +70,53 @@ data class TaskResponse(
     val message: String,
     val data: List<TaskDetails>?
 )
-data class TaskDetails(val taskId: String, val taskName: String, val taskDescription: String, val expectedDate: String,val status: String, val kpi: String, val noOfReminder: String, val comment: String,val assigneeName: String, val assigneeEmail: String, val assigneePhone: String, val ownerName: String, val ownerEmail: String, val ownerPhone: String, val teamId: String, val teamName: String, val teamDescription: String)
 
-
+data class TaskDetails(
+    val taskId: String,
+    val taskName: String,
+    val taskDescription: String,
+    val expectedDate: String,
+    val status: String,
+    val kpi: String,
+    val noOfReminder: String,
+    val comment: String,
+    val assigneeName: String,
+    val assigneeEmail: String,
+    val assigneePhone: String,
+    val ownerName: String,
+    val ownerEmail: String,
+    val ownerPhone: String,
+    val teamId: String,
+    val teamName: String,
+    val teamDescription: String
+)
 
 
 // Team Details request and response
-data class TeamRequestAddEdit(val teamId: String, val teamName: String, val description: String, val image: String, val updatedBy: String)
+data class TeamRequestAddEdit(
+    val teamId: String,
+    val teamName: String,
+    val description: String,
+    val image: String,
+    val updatedBy: String
+)
+
 data class TeamRequestDelete(val teamId: String, val updatedBy: String)
-data class TeamMemberRequestAdd(val teamId: String,val teamMemberId: String, val updatedBy: String)
+data class TeamMemberRequestAdd(val teamId: String, val teamMemberId: String, val updatedBy: String)
 data class TeamResponse(
     val statusCode: Int,
     val status: String,
     val message: String,
     val data: List<TeamDetails>?
 )
-data class TeamDetails(val teamId: String, val teamName: String, val description: String, val image: String)
+
+data class TeamDetails(
+    val teamId: String,
+    val teamName: String,
+    val description: String,
+    val image: String
+)
+
 data class MyTeamData(val teamId: String)
 
 
@@ -90,6 +126,18 @@ data class TeamMemberResponse(
     val message: String,
     val data: List<TeamMemberDetails>?
 )
-data class TeamMemberDetails(val teamMemberDetailsId: String, val userId: String, val name: String, val email: String,val phone: String,val userImage: String, val teamId: String, val teamName: String, val description: String, val image: String)
+
+data class TeamMemberDetails(
+    val teamMemberDetailsId: String,
+    val userId: String,
+    val name: String,
+    val email: String,
+    val phone: String,
+    val userImage: String,
+    val teamId: String,
+    val teamName: String,
+    val description: String,
+    val image: String
+)
 
 
