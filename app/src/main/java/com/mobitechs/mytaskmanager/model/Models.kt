@@ -34,7 +34,8 @@ data class UserData(
     val isDelete: Int=0,
     val createdAt: String = "",
     val updatedAt: String = "",
-    val updatedBy: Int=0
+    val updatedBy: Int=0,
+    val isEnabler: Int = 0
 )
 
 data class MyData(val userId: String)
@@ -103,8 +104,7 @@ data class TaskDetails(
     val teamId: String = "",
     val teamName: String = "",
     val teamDescription: String = "",
-    val createdAt: String = "",
-    val isEnabler: Int = 0
+    val createdAt: String = ""
 )
 
 

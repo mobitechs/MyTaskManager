@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.KpiDetails
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.StatusDetails
@@ -248,13 +249,7 @@ fun TaskBox(title: String, taskList: List<TaskStatusWiseCountDetails>, navContro
 
 @Composable
 fun TaskStatusItem(task: TaskStatusWiseCountDetails, navController: NavController) {
-    val statusColor = when (task.statusName) {
-        "Completed" -> Color(0xFF4CAF50) // Green
-        "WIP" -> Color(0xFFFFEB3B) // Yellow
-        "Reopened" -> Color(0xFFF44336) // Red
-        "To Do" -> Color(0xFFF44336) // Red
-        else -> Color.Gray
-    }
+    var statusColor = setStatusColor(task.statusName)
 
     Card(
         modifier = Modifier

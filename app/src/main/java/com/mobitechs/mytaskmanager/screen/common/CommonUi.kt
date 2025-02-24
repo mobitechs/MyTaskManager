@@ -226,3 +226,14 @@ fun ConfirmationDialog(
         )
     }
 }
+
+fun setStatusColor(statusName:String): Color {
+    val statusColor = when (statusName) {
+        "Completed" -> Color(0xFF4CAF50) // Green
+        "WIP" -> Color(0xFFFFEB3B) // Yellow
+        "Reopened" -> Color(0xFFF44336) // Red
+        "To Do" -> Color(0xFFF44336) // Red
+        else -> Color.Gray
+    }
+    return statusColor
+}

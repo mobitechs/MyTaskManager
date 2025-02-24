@@ -3,7 +3,8 @@ package com.mobitechs.mytaskmanager.screen.taskForMe
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,15 +19,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -34,9 +31,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -58,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.util.formatDateTime
@@ -148,10 +144,12 @@ fun TaskForMeScreen(navController: NavController) {
         },
         bottomBar = { BottomNavigationBar(navController) },
 
-    ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
 
             SearchBar(
                 searchQuery, taskList, selectedDate,
@@ -304,9 +302,11 @@ fun TaskListView(
     context: Context,
     refreshList: () -> Unit
 ) {
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp)) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
         items(tasks) { task ->
             TaskCard(task, navController, viewModel, userId, context, refreshList)
         }
@@ -322,7 +322,7 @@ fun TaskCard(
     context: Context,
     refreshList: () -> Unit
 ) {
-
+    var statusColor = setStatusColor(task.statusName)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -336,55 +336,62 @@ fun TaskCard(
                     }"
                 )
             },
-        elevation = 4.dp
+        elevation = 4.dp,
+        border = BorderStroke(1.dp, statusColor),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
-            Text("Expected: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
-            Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
+        Column(modifier = Modifier.background(statusColor.copy(alpha = 0.1f))) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
+                Text(
+                    "Expected: ${formatDateTime(task.expectedDate)}",
+                    fontSize = 12.sp,
+                    color = Color.Red
+                )
+                Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
 
 
-            // Row for Status, Assigned To, Team Name & Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Assigned by: ${task.ownerName}", fontSize = 12.sp, color = Color.Black)
-                    Text("Team: ${task.ownerTeamName}", fontSize = 12.sp, color = Color.Magenta)
-                }
-
-                Row {
-                    // 🖊 Edit Button
-                    IconButton(onClick = {
-                        navController.navigate(
-                            "taskForMeDetailsScreen/${
-                                Gson().toJson(
-                                    task
-                                )
-                            }"
+                // Row for Status, Assigned To, Team Name & Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Assigned by: ${task.ownerName}",
+                            fontSize = 12.sp,
+                            color = Color.Black
                         )
-                    }) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Edit Task",
-                            tint = Color.Blue
-                        )
+                        Text("Team: ${task.ownerTeamName}", fontSize = 12.sp, color = Color.Magenta)
                     }
 
-                }
-            }
+                    Row {
+                        // 🖊 Edit Button
+                        IconButton(onClick = {
+                            navController.navigate(
+                                "taskForMeDetailsScreen/${
+                                    Gson().toJson(
+                                        task
+                                    )
+                                }"
+                            )
+                        }) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit Task",
+                                tint = Color.Blue
+                            )
+                        }
 
+                    }
+                }
+
+            }
         }
     }
 
 }
-
-
-
-
 
 
 @Composable
@@ -400,10 +407,21 @@ fun TaskSummaryCard(taskList: List<TaskDetails>, selectedTeam: String) {
         backgroundColor = Color.White
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("$selectedTeam Task Summary", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(
+                "$selectedTeam Task Summary",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
             Spacer(modifier = Modifier.height(8.dp))
             statusCounts.forEach { (status, count) ->
-                Text("$status: $count", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+                var statusColor = setStatusColor(status)
+                Text(
+                    "$status: $count",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = statusColor
+                )
             }
         }
     }

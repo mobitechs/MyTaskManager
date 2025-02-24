@@ -74,6 +74,7 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
+    var isEnabler = user.value?.isEnabler.toString()
 
     LaunchedEffect(refreshAPITrigger,team.value.teamId) {
         viewModel.fetchTeamsMembers(MyTeamData(team.value.teamId)) { response ->
@@ -97,9 +98,12 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
             }, backgroundColor = MaterialTheme.colors.primarySurface)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showSearch = true }, shape = CircleShape) {
-                Icon(Icons.Default.AccountCircle, contentDescription = "Add Member")
+            if(isEnabler == "1"){
+                FloatingActionButton(onClick = { showSearch = true }, shape = CircleShape) {
+                    Icon(Icons.Default.AccountCircle, contentDescription = "Add Member")
+                }
             }
+
         }
     ) { paddingValues ->
         Column(
@@ -143,34 +147,37 @@ fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(member.name, fontSize = 16.sp, color = Color.Black)
                                 Spacer(modifier = Modifier.weight(1f))
-                                IconButton(onClick = {
+                                if(isEnabler == "1"){
+                                    IconButton(onClick = {
 //                                    viewModel.removeTeamMember(team.value.id, member.id)
-                                    viewModel.deleteTeamMember(
-                                        TeamMemberRequestAdd(
-                                            team.value.teamId,
-                                            member.userId,
-                                            userId
-                                        )
-                                    ) { response ->
-                                        isLoading = false
-                                        response?.let {
+                                        viewModel.deleteTeamMember(
+                                            TeamMemberRequestAdd(
+                                                team.value.teamId,
+                                                member.userId,
+                                                userId
+                                            )
+                                        ) { response ->
+                                            isLoading = false
+                                            response?.let {
 //                                            teamMembers = teamMembers.toMutableList().apply {
 //                                                removeIf { it.userId == member.userId }
 //                                            }
-                                            refreshAPITrigger++
-                                            ShowToast(context, it.message)
-                                        } ?: run {
-                                            errorMessage = "Unexpected error occurred"
-                                            ShowToast(context, errorMessage!!)
+                                                refreshAPITrigger++
+                                                ShowToast(context, it.message)
+                                            } ?: run {
+                                                errorMessage = "Unexpected error occurred"
+                                                ShowToast(context, errorMessage!!)
+                                            }
                                         }
+                                    }) {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = "Remove Member",
+                                            tint = Color.Red
+                                        )
                                     }
-                                }) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = "Remove Member",
-                                        tint = Color.Red
-                                    )
                                 }
+
                             }
                         }
                     }

@@ -3,6 +3,8 @@ package com.mobitechs.mytaskmanager.screen.taskDelegate
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -55,11 +56,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
+import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
 import com.mobitechs.mytaskmanager.util.ShowToast
-import com.mobitechs.mytaskmanager.util.formatDateTime
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 import java.text.SimpleDateFormat
@@ -154,9 +155,11 @@ fun TaskDelegateListScreen(navController: NavController) {
             ) { Icon(Icons.Default.Add, contentDescription = "Add Task") }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
 
             SearchBar(
                 searchQuery, taskList, selectedDate,
@@ -175,7 +178,6 @@ fun TaskDelegateListScreen(navController: NavController) {
                         if (date == "All") taskList else taskList.filter { it.expectedDate == date }
                 }
             )
-
 
 
             // Team Filter Section
@@ -210,7 +212,7 @@ fun TaskDelegateListScreen(navController: NavController) {
                 }
             }
 
-            TaskSummaryCard(filteredTasks,selectedTeam)
+            TaskSummaryCard(filteredTasks, selectedTeam)
 
             TaskListView(
                 navController,
@@ -307,9 +309,11 @@ fun TaskListView(
     context: Context,
     refreshList: () -> Unit
 ) {
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         items(tasks) { task ->
             TaskCard(task, navController, viewModel, userId, context, refreshList)
         }
@@ -327,49 +331,60 @@ fun TaskCard(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    var statusColor = setStatusColor(task.statusName)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
 //            .clickable { navController.navigate("taskDetailsScreen/${Gson().toJson(task)}") }
-            ,elevation = 4.dp
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
-            Text("Deadline: ${task.deadlineDate}", fontSize = 12.sp, color = Color.Red)
-//            Text("Deadline: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
-            // Row for Status, Assigned To, Team Name & Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
-                    Text("Assigned to: ${task.assigneeName}", fontSize = 12.sp, color = Color.Black)
-                    Text("Team: ${task.teamName}", fontSize = 12.sp, color = Color.Magenta)
-                }
+        elevation = 4.dp,
+        border = BorderStroke(1.dp, statusColor),
 
-                Row {
-                    // 🖊 Edit Button
-                    IconButton(onClick = {
-                        navController.navigate("taskAddScreen/${Gson().toJson(task)}")
-                    }) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Edit Task",
-                            tint = Color.Blue
+        ) {
+        Column(modifier = Modifier.background(statusColor.copy(alpha = 0.1f))) {
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
+                Text("Deadline: ${task.deadlineDate}", fontSize = 12.sp, color = Color.Red)
+//            Text("Deadline: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
+                // Row for Status, Assigned To, Team Name & Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
+                        Text(
+                            "Assigned to: ${task.assigneeName}",
+                            fontSize = 12.sp,
+                            color = Color.Black
                         )
+                        Text("Team: ${task.teamName}", fontSize = 12.sp, color = Color.Magenta)
                     }
 
-                    // 🗑 Delete Button
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Delete Task",
-                            tint = Color.Red
-                        )
+                    Row {
+                        // 🖊 Edit Button
+                        IconButton(onClick = {
+                            navController.navigate("taskAddScreen/${Gson().toJson(task)}")
+                        }) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit Task",
+                                tint = Color.Blue
+                            )
+                        }
+
+                        // 🗑 Delete Button
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete Task",
+                                tint = Color.Red
+                            )
+                        }
                     }
                 }
             }
@@ -414,16 +429,27 @@ fun TaskSummaryCard(taskList: List<TaskDetails>, selectedTeam: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding( horizontal = 16.dp),
 //        shape = RoundedCornerShape(8.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("$selectedTeam Task Summary", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(
+                "$selectedTeam Task Summary",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
             Spacer(modifier = Modifier.height(8.dp))
             statusCounts.forEach { (status, count) ->
-                Text("$status: $count", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+                var statusColor = setStatusColor(status)
+                Text(
+                    "$status: $count",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = statusColor
+                )
             }
         }
     }

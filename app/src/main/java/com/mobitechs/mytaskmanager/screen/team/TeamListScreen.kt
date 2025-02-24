@@ -57,6 +57,7 @@ fun TeamListScreen(navController: NavController) {
     val viewModel: ViewModelTeam = viewModel()
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
+    var isEnabler = user.value?.isEnabler.toString()
 
     var teamDetailsList by remember { mutableStateOf<List<TeamDetails>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -154,36 +155,39 @@ fun TeamListScreen(navController: NavController) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(team.teamName, fontSize = 18.sp, color = Color.Black)
                                     Text(team.description, fontSize = 14.sp, color = Color.Gray)
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
-                                    ) {
-                                        IconButton(onClick = {
-                                            navController.navigate(
-                                                "teamAddScreen/${
-                                                    Gson().toJson(
-                                                        team
-                                                    )
-                                                }"
-                                            )
-                                        }) {
-                                            Icon(
-                                                Icons.Default.Edit,
-                                                contentDescription = "Edit Team",
-                                                tint = Color.Blue
-                                            )
-                                        }
-                                        IconButton(onClick = {
-//                                            viewModel.deleteTeam(TeamRequestDelete(team.teamId,userId))
-                                            teamDetails = team
-                                            showDeleteDialog = true
 
-                                        }) {
-                                            Icon(
-                                                Icons.Default.Delete,
-                                                contentDescription = "Delete Team",
-                                                tint = Color.Red
-                                            )
+                                    if(isEnabler == "1"){
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            IconButton(onClick = {
+                                                navController.navigate(
+                                                    "teamAddScreen/${
+                                                        Gson().toJson(
+                                                            team
+                                                        )
+                                                    }"
+                                                )
+                                            }) {
+                                                Icon(
+                                                    Icons.Default.Edit,
+                                                    contentDescription = "Edit Team",
+                                                    tint = Color.Blue
+                                                )
+                                            }
+                                            IconButton(onClick = {
+//                                            viewModel.deleteTeam(TeamRequestDelete(team.teamId,userId))
+                                                teamDetails = team
+                                                showDeleteDialog = true
+
+                                            }) {
+                                                Icon(
+                                                    Icons.Default.Delete,
+                                                    contentDescription = "Delete Team",
+                                                    tint = Color.Red
+                                                )
+                                            }
                                         }
                                     }
                                 }
