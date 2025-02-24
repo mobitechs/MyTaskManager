@@ -164,14 +164,14 @@ function deleteTeamMember($data) {
 
 function addTask($data) {
     $dao = new UsersDetailsDAO();
-    $result =  $dao->addTask($data['taskName'], $data['taskDescription'], $data['kpi'], $data['ownerId'], $data['assigneeId'], $data['teamId'], $data['expectedDate'], $data['status'], $data['updatedBy']);
+    $result =  $dao->addTask($data['taskName'], $data['taskDescription'], $data['kpi'], $data['ownerId'], $data['assigneeId'], $data['teamId'], $data['expectedDate'], $data['statusId'], $data['updatedBy']);
     response($result['statusCode'],$result['status'], $result['message'], $result['data']);
 
 }
 
 function editTask($data) {
     $dao = new UsersDetailsDAO();
-    $result =  $dao->editTask($data['taskId'], $data['taskName'], $data['taskDescription'], $data['kpi'], $data['ownerId'], $data['assigneeId'], $data['teamId'], $data['expectedDate'], $data['status'], $data['updatedBy']);
+    $result =  $dao->editTask($data['taskId'], $data['taskName'], $data['taskDescription'], $data['kpi'], $data['ownerId'], $data['assigneeId'], $data['teamId'], $data['expectedDate'], $data['statusId'], $data['updatedBy']);
     response($result['statusCode'],$result['status'], $result['message'], $result['data']);
 
 }
@@ -184,7 +184,7 @@ function deleteTask($data) {
 
 function updateStatus($data) {
     $dao = new UsersDetailsDAO();
-    $result =  $dao->updateStatus($data['taskId'], $data['status'], $data['updatedBy']);
+    $result =  $dao->updateStatus($data['taskId'], $data['statusId'], $data['updatedBy']);
     response($result['statusCode'],$result['status'], $result['message'], $result['data']);
 
 }

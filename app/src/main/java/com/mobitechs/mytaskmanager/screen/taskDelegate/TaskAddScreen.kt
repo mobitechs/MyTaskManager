@@ -66,8 +66,10 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 taskDescription = "",
                 expectedDate = "",
                 deadlineDate = "",
-                status = "To Do",
-                kpi = "",
+                statusId = "To Do",
+                statusName = "To Do",
+                kpiId = "",
+                kpiName = "",
                 noOfReminder = "",
                 comment = "",
                 assigneeId="",
@@ -77,6 +79,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 ownerName = "",
                 ownerEmail = "",
                 ownerPhone = "",
+                ownerTeamName = "",
                 teamId = "",
                 teamName = "",
                 teamDescription = "",
@@ -87,13 +90,13 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
 
     var taskName by remember { mutableStateOf(taskDetails.value.taskName) }
     var taskDescription by remember { mutableStateOf(taskDetails.value.taskDescription) }
-    var kpi by remember { mutableStateOf(taskDetails.value.kpi) }
+    var kpi by remember { mutableStateOf(taskDetails.value.kpiName) }
     var selectedTeamId by remember { mutableStateOf(taskDetails.value.teamId) }
     var selectedTeamName by remember { mutableStateOf(taskDetails.value.teamName) }
     var selectedAssigneeId by remember { mutableStateOf(taskDetails.value.assigneeId) }
     var selectedAssigneeName by remember { mutableStateOf(taskDetails.value.assigneeName) }
     var expectedDate by remember { mutableStateOf(taskDetails.value.expectedDate) }
-    var status by remember { mutableStateOf(taskDetails.value.status) }
+    var status by remember { mutableStateOf(taskDetails.value.statusName) }
 
     var isLoading by remember { mutableStateOf(true) }
     var teams by remember { mutableStateOf<List<TeamDetails>>(emptyList()) }

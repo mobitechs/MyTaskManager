@@ -3,18 +3,20 @@ package com.mobitechs.mytaskmanager.screen.taskDelegate
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -57,6 +59,7 @@ import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
 import com.mobitechs.mytaskmanager.util.ShowToast
+import com.mobitechs.mytaskmanager.util.formatDateTime
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 import java.text.SimpleDateFormat
@@ -115,27 +118,27 @@ fun TaskDelegateListScreen(navController: NavController) {
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "To Do";
-                            filteredTasks = taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.statusName == selectedStatus }
                         }
                         ) {
                             Text("To Do Tasks")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "Reopened";
-                            filteredTasks = taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.statusName == selectedStatus }
                         }
                         ) {
                             Text("Reopened Tasks")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "WIP";
-                            filteredTasks = taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.statusName == selectedStatus }
                         }) {
                             Text("WIP Tasks")
                         }
                         DropdownMenuItem(onClick = {
                             selectedStatus = "Completed";
-                            filteredTasks = taskList.filter { it.status == selectedStatus }
+                            filteredTasks = taskList.filter { it.statusName == selectedStatus }
                         }) {
                             Text("Completed Tasks")
                         }
@@ -173,6 +176,8 @@ fun TaskDelegateListScreen(navController: NavController) {
                 }
             )
 
+
+
             // Team Filter Section
             val teamCounts = taskList.groupingBy { it.teamName }.eachCount()
             val allCount = taskList.size
@@ -180,7 +185,7 @@ fun TaskDelegateListScreen(navController: NavController) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
@@ -204,6 +209,8 @@ fun TaskDelegateListScreen(navController: NavController) {
                     )
                 }
             }
+
+            TaskSummaryCard(filteredTasks,selectedTeam)
 
             TaskListView(
                 navController,
@@ -330,8 +337,8 @@ fun TaskCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
-            Text("Due: ${task.expectedDate}", fontSize = 12.sp, color = Color.Red)
-
+            Text("Deadline: ${task.deadlineDate}", fontSize = 12.sp, color = Color.Red)
+//            Text("Deadline: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
             // Row for Status, Assigned To, Team Name & Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -339,7 +346,7 @@ fun TaskCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Status: ${task.status}", fontSize = 12.sp, color = Color.Blue)
+                    Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
                     Text("Assigned to: ${task.assigneeName}", fontSize = 12.sp, color = Color.Black)
                     Text("Team: ${task.teamName}", fontSize = 12.sp, color = Color.Magenta)
                 }
@@ -380,7 +387,7 @@ fun TaskCard(
                     onClick = {
                         viewModel.deleteTask(TaskRequestDelete(task.taskId, userId)) { response ->
                             response?.let {
-                                refreshList() // 🔄 Refresh task list after deletion
+                                refreshList()
                                 ShowToast(context, it.message)
                             }
                         }
@@ -397,5 +404,27 @@ fun TaskCard(
                 }
             }
         )
+    }
+}
+
+@Composable
+fun TaskSummaryCard(taskList: List<TaskDetails>, selectedTeam: String) {
+    val statusCounts = taskList.groupingBy { it.statusName }.eachCount()
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+//        shape = RoundedCornerShape(8.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("$selectedTeam Task Summary", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(8.dp))
+            statusCounts.forEach { (status, count) ->
+                Text("$status: $count", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+            }
+        }
     }
 }

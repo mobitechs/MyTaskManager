@@ -8,6 +8,7 @@ import com.mobitechs.mytaskmanager.model.LoginRequest
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.MyTeamData
 import com.mobitechs.mytaskmanager.model.SetPasswordRequest
+import com.mobitechs.mytaskmanager.model.TaskKPIResponse
 import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
 import com.mobitechs.mytaskmanager.model.TaskRequestComment
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
@@ -15,6 +16,8 @@ import com.mobitechs.mytaskmanager.model.TaskRequestReminder
 import com.mobitechs.mytaskmanager.model.TaskRequestStatus
 import com.mobitechs.mytaskmanager.model.TaskRequestUpdate
 import com.mobitechs.mytaskmanager.model.TaskResponse
+import com.mobitechs.mytaskmanager.model.TaskStatusResponse
+import com.mobitechs.mytaskmanager.model.TaskStatusWiseCountResponse
 import com.mobitechs.mytaskmanager.model.TeamMemberRequestAdd
 import com.mobitechs.mytaskmanager.model.TeamMemberResponse
 import com.mobitechs.mytaskmanager.model.TeamRequestAddEdit
@@ -103,6 +106,21 @@ interface ApiService {
 
     @POST("updateTaskDetails")
     suspend fun updateTaskDetails(@Body task: TaskRequestUpdate): ApiResponse
+
+
+    //hoe page API
+
+    @POST("getCountOfTaskListAssignedByMe")
+    suspend fun getCountOfTaskListAssignedByMe(@Body task: MyData): TaskStatusWiseCountResponse
+
+    @POST("getCountOfTaskListAssignedToMe")
+    suspend fun getCountOfTaskListAssignedToMe(@Body task: MyData): TaskStatusWiseCountResponse
+
+    @POST("getStatusList")
+    suspend fun getStatusList(): TaskStatusResponse
+
+    @POST("getKpiList")
+    suspend fun getKpiList(): TaskKPIResponse
 
 
 }

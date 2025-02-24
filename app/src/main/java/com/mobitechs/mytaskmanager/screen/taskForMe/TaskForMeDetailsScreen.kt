@@ -63,7 +63,7 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
     val viewModel: ViewModelTask = viewModel()
 
     val task = remember { Gson().fromJson(taskJson, TaskDetails::class.java) }
-    var selectedStatus by remember { mutableStateOf(task.status) }
+    var selectedStatus by remember { mutableStateOf(task.statusName) }
     var selectedDeadlineDate by remember { mutableStateOf(task.deadlineDate) }
     var commentText by remember { mutableStateOf(task.comment) }
 
@@ -111,29 +111,18 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     TaskDetailRow(Icons.Default.Description, "Description", task.taskDescription)
-                    TaskDetailRow(Icons.Default.Star, "KPI", task.kpi)
+                    TaskDetailRow(Icons.Default.Star, "KPI", task.kpiName)
                     TaskDetailRow(Icons.Default.Notifications, "Reminders", task.noOfReminder)
-                    TaskDetailRow(
-                        Icons.Default.CalendarMonth,
-                        "Created at",
-                        formatDateTime(task.createdAt)
-                    )
-                    TaskDetailRow(
-                        Icons.Default.CalendarMonth,
-                        "Expected Date",
-                        formatDateTime(task.expectedDate)
-                    )
+                    TaskDetailRow(Icons.Default.CalendarMonth, "Created at", formatDateTime(task.createdAt))
+                    TaskDetailRow(Icons.Default.CalendarMonth, "Expected Date", formatDateTime(task.expectedDate))
                     TaskDetailRow(Icons.Default.Person, "Assigned By", task.ownerName)
                     //TaskDetailRow(Icons.Default.Group, "Team", task.teamName)
                     Spacer(modifier = Modifier.height(8.dp))
 
-
-                    Text(
-                        "Dead Line:",
+                    Text("Dead Line:",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        color = Color.Black
-                    )
+                        color = Color.Black)
                     Spacer(modifier = Modifier.height(4.dp))
                     DatePickerButton(
                         selectedDate = selectedDeadlineDate,
