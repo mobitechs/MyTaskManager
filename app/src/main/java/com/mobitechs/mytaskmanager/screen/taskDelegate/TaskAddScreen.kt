@@ -1,11 +1,23 @@
 package com.mobitechs.mytaskmanager.screen.taskDelegate
 
+import android.Manifest
+import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -17,6 +29,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,7 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +64,7 @@ import com.mobitechs.mytaskmanager.util.getSessionKpiDetails
 import com.mobitechs.mytaskmanager.util.getSessionStatusDetails
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
+import java.util.Locale
 
 @Composable
 fun TaskAddScreen(navController: NavController, taskJson: String?) {
@@ -121,7 +138,98 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
     val userId = user.value?.userId.toString()
 
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+//    var text by remember { mutableStateOf("") }
+    var isSpeaking by remember { mutableStateOf(false) }
+    var permissionGranted by remember { mutableStateOf(false) }
+    var isListening by remember { mutableStateOf(false)}
+
+        val tts = remember {
+        TextToSpeech(context) { status ->
+            if (status != TextToSpeech.SUCCESS) {
+                Log.e("TTS", "Initialization failed!")
+            }
+        }
+    }
+
+    tts.language = Locale.US
+
+    fun startSpeech() {
+
+        if (permissionGranted) {
+            isSpeaking = true
+            ShowToast(context,"Start Speech")
+            tts.speak(taskDescription, TextToSpeech.QUEUE_FLUSH, null, null)
+
+        }
+    }
+    fun stopSpeech() {
+
+        ShowToast(context,"stop Speech")
+        if (tts.isSpeaking) {
+            tts.stop()
+            isSpeaking = false
+        }
+    }
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        permissionGranted = isGranted
+    }
+
+    val speechRecognizer = remember {
+        SpeechRecognizer.createSpeechRecognizer(context)
+    }
+
+    val speechIntent = remember {
+        android.content.Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now...")
+        }
+    }
+
+    speechRecognizer.setRecognitionListener(object : RecognitionListener {
+        override fun onReadyForSpeech(params: Bundle?) {}
+        override fun onBeginningOfSpeech() {
+            isListening = true
+        }
+
+        override fun onRmsChanged(rmsdB: Float) {}
+        override fun onBufferReceived(buffer: ByteArray?) {}
+        override fun onEndOfSpeech() {
+            isListening = false
+        }
+
+        override fun onError(error: Int) {
+            isListening = false
+            Log.e("STT", "Error: $error")
+        }
+
+        override fun onResults(results: Bundle?) {
+            val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+            if (!matches.isNullOrEmpty()) {
+                taskDescription+= " ${matches[0]}" // Set text field with spoken words
+            }
+            isListening = false
+        }
+
+        override fun onPartialResults(partialResults: Bundle?) {}
+        override fun onEvent(eventType: Int, params: Bundle?) {}
+    })
+
+    fun startListening() {
+        speechRecognizer.startListening(speechIntent)
+    }
+
+    fun stopListening() {
+        speechRecognizer.stopListening()
+    }
+
+
+
     LaunchedEffect(Unit) {
+        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         viewModel.getUserList(MyData(userId)) { response ->
             isLoading = false
             response?.let {
@@ -146,10 +254,6 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
             }
         }
     }
-
-
-
-
 
     Scaffold(
         topBar = {
@@ -176,22 +280,49 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = taskDescription,
-                onValueChange = { taskDescription = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
 //            OutlinedTextField(
-//                value = kpi,
-//                onValueChange = { kpi = it },
-//                label = { Text("KPI") },
+//                value = taskDescription,
+//                onValueChange = { taskDescription = it },
+//                label = { Text("Description") },
 //                modifier = Modifier.fillMaxWidth(),
 //                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
 //            )
+
+            OutlinedTextField(
+                value = taskDescription,
+                onValueChange = { taskDescription = it },
+                label = { Text("Type or Speak...") },
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            if (permissionGranted) {
+                                if (isListening) {
+                                    stopListening()
+                                } else {
+                                    startListening()
+                                }
+                            } else {
+                                requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                ShowToast(context,"Permission not Granted")
+                            }
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isListening) Icons.Default.Stop else Icons.Default.Mic,
+                            contentDescription = "Speech Recognition",
+                            tint = if (isListening) Color.Red else Color(0xFF25D366)
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .weight(1f)
+                    .background(Color.White, shape = CircleShape)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
             DropdownField(
                 label = "Select KPI",
                 options = kpiList.map { it.kpiName },

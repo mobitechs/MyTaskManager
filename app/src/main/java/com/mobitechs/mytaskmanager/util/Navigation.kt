@@ -20,6 +20,7 @@ import com.mobitechs.mytaskmanager.screen.team.TeamAddScreen
 import com.mobitechs.mytaskmanager.screen.team.TeamListScreen
 import com.mobitechs.mytaskmanager.screen.team.TeamMemberDetailsScreen
 import com.mobitechs.mytaskmanager.screen.team.TeamWiseTaskDetails
+import com.mobitechs.mytaskmanager.screen.user.ProfileScreen
 import com.mobitechs.mytaskmanager.viewModel.ViewModelUser
 
 @Composable
@@ -39,6 +40,7 @@ fun AppNavigation(viewModel: ViewModelUser) {
         }
         composable("homeScreen") { HomeScreen(navController) }
         composable("teamLisScreen") { TeamListScreen(navController) }
+        composable("profileScreen") { ProfileScreen(navController) }
 
         composable(
             "teamAddScreen/{teamJson}",
