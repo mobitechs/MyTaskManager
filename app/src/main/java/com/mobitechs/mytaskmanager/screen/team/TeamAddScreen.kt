@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
 import com.google.gson.Gson
+import com.mobitechs.mytaskmanager.model.TaskStatusWiseCountDetails
 import com.mobitechs.mytaskmanager.model.TeamDetails
 import com.mobitechs.mytaskmanager.model.TeamRequestAddEdit
 import com.mobitechs.mytaskmanager.util.ShowToast
@@ -46,12 +47,17 @@ fun TeamAddScreen(navController: NavController, teamJson: String?) {
     val context = LocalContext.current
     val viewModel: ViewModelTeam = viewModel()
     val isEditMode = teamJson != "null" && teamJson != null
+    val statusList: List<TaskStatusWiseCountDetails> = emptyList()
+
     val teamDetails = remember {
         mutableStateOf(
             if (isEditMode) Gson().fromJson(
                 teamJson,
                 TeamDetails::class.java
-            ) else TeamDetails(teamId = "", teamName = "", description = "", image = "")
+            ) else TeamDetails(
+                teamId = "", teamName = "", description = "", image = "",
+                statuses = statusList
+            )
         )
     }
 

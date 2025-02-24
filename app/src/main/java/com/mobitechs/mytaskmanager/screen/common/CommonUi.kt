@@ -81,10 +81,10 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(icon = {
             Icon(
                 Icons.Default.CheckCircle,
-                contentDescription = "My Team"
+                contentDescription = "All Team"
             )
         },
-            label = { Text("My Team") },
+            label = { Text("All Team") },
 //            selected = false,
             selected = currentRoute == "teamLisScreen",
             onClick = { navController.navigate("teamLisScreen") })

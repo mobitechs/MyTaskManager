@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,7 +24,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,7 +45,9 @@ import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.BottomNavigationBar
 import com.mobitechs.mytaskmanager.components.ConfirmationDialog
+import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.MyData
+import com.mobitechs.mytaskmanager.model.TaskStatusWiseCountDetails
 import com.mobitechs.mytaskmanager.model.TeamDetails
 import com.mobitechs.mytaskmanager.model.TeamRequestDelete
 import com.mobitechs.mytaskmanager.util.ShowToast
@@ -85,7 +89,8 @@ fun TeamListScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Team") },
+            TopAppBar(
+                title = { Text("My Team") },
 //                navigationIcon = {
 //                    IconButton(onClick = { navController.popBackStack() }) {
 //                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -153,43 +158,61 @@ fun TeamListScreen(navController: NavController) {
                                 elevation = 4.dp
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(team.teamName, fontSize = 18.sp, color = Color.Black)
+//                                    Text(team.teamName, fontSize = 18.sp, color = Color.Black)
+                                    Text(
+                                        team.teamName,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black
+                                    )
                                     Text(team.description, fontSize = 14.sp, color = Color.Gray)
 
-                                    if(isEnabler == "1"){
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.End
-                                        ) {
-                                            IconButton(onClick = {
-                                                navController.navigate(
-                                                    "teamAddScreen/${
-                                                        Gson().toJson(
-                                                            team
-                                                        )
-                                                    }"
-                                                )
-                                            }) {
-                                                Icon(
-                                                    Icons.Default.Edit,
-                                                    contentDescription = "Edit Team",
-                                                    tint = Color.Blue
-                                                )
-                                            }
-                                            IconButton(onClick = {
-//                                            viewModel.deleteTeam(TeamRequestDelete(team.teamId,userId))
-                                                teamDetails = team
-                                                showDeleteDialog = true
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
+                                        TaskSummaryCard(team.statuses, team.teamName)
 
-                                            }) {
-                                                Icon(
-                                                    Icons.Default.Delete,
-                                                    contentDescription = "Delete Team",
-                                                    tint = Color.Red
-                                                )
+                                        Row {
+                                            if (isEnabler == "1") {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.End
+                                                ) {
+                                                    IconButton(onClick = {
+                                                        navController.navigate(
+                                                            "teamAddScreen/${
+                                                                Gson().toJson(
+                                                                    team
+                                                                )
+                                                            }"
+                                                        )
+                                                    }) {
+                                                        Icon(
+                                                            Icons.Default.Edit,
+                                                            contentDescription = "Edit Team",
+                                                            tint = Color.Blue
+                                                        )
+                                                    }
+                                                    IconButton(onClick = {
+//                                            viewModel.deleteTeam(TeamRequestDelete(team.teamId,userId))
+                                                        teamDetails = team
+                                                        showDeleteDialog = true
+
+                                                    }) {
+                                                        Icon(
+                                                            Icons.Default.Delete,
+                                                            contentDescription = "Delete Team",
+                                                            tint = Color.Red
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }
+
+
                                 }
                             }
                         }
@@ -229,3 +252,27 @@ fun TeamListScreen(navController: NavController) {
 }
 
 
+@Composable
+fun TaskSummaryCard(statusList: List<TaskStatusWiseCountDetails>, selectedTeam: String) {
+
+    if (statusList.isNotEmpty()) {
+        Column(modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 1.dp, end = 4.dp)) {
+            Text("Task Summary", fontSize = 18.sp, color = Color.Black)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Corrected: Use forEach instead of items()
+            statusList.forEach { status ->
+                val statusColor = setStatusColor(status.statusName)
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = "${status.statusName}: ${status.totalCount}",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = statusColor,
+
+                )
+            }
+        }
+    }
+
+}

@@ -110,6 +110,7 @@ fun HomeScreen(navController: NavController) {
                     setSessionStatusDetails(context, it.data)
                 } else {
                     errorMessage = it.message
+                    ShowToast(context,it.message)
                 }
             }
         }
@@ -120,6 +121,7 @@ fun HomeScreen(navController: NavController) {
                     setSessionKpiDetails(context, it.data)
                 } else {
                     errorMessage = it.message
+                    ShowToast(context,it.message)
                 }
             }
         }

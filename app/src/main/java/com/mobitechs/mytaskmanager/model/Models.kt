@@ -119,6 +119,8 @@ data class TeamRequestAddEdit(
 
 data class TeamRequestDelete(val teamId: String, val updatedBy: String)
 data class TeamMemberRequestAdd(val teamId: String, val teamMemberId: String, val updatedBy: String)
+
+
 data class TeamResponse(
     val statusCode: Int=0,
     val status: String = "",
@@ -130,8 +132,10 @@ data class TeamDetails(
     val teamId: String = "",
     val teamName: String = "",
     val description: String = "",
-    val image: String = ""
+    val image: String = "",
+    val statuses: List<TaskStatusWiseCountDetails>,
 )
+
 
 data class MyTeamData(val teamId: String)
 
