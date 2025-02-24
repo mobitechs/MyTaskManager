@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobitechs.mytaskmanager.model.ApiResponse
 import com.mobitechs.mytaskmanager.model.MyData
+import com.mobitechs.mytaskmanager.model.MyTeamData
 import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
 import com.mobitechs.mytaskmanager.model.TaskRequestComment
 import com.mobitechs.mytaskmanager.model.TaskRequestDelete
@@ -55,6 +56,28 @@ class ViewModelTask : ViewModel() {
         viewModelScope.launch {
             try {
                 val res = RetrofitClient.apiService.getTaskListAssignedByMe(myData)
+                if (res.statusCode == 200) {
+                    response = res.message
+                }
+                onResponse(res)
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                onResponse(handleHttpExceptionTask(e))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResponse(TaskResponse(500, "error", "Unexpected error occurred", null))
+            }
+        }
+    }
+
+
+    fun getTeamWiseTaskDetails(
+        myData: MyTeamData,
+        onResponse: (TaskResponse?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val res = RetrofitClient.apiService.getTeamWiseTaskDetails(myData)
                 if (res.statusCode == 200) {
                     response = res.message
                 }

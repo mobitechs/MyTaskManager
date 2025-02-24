@@ -37,14 +37,14 @@ fun setSessionKpiDetails(context: Context, list: List<KpiDetails>?) {
     sharedPreferences.edit().putString("kpi", json).apply()
 }
 
-fun getSessionKpiDetails(context: Context): KpiDetails? {
+fun getSessionKpiDetails(context: Context): List<KpiDetails>? {
     val sharedPreferences = context.getSharedPreferences("KPIDetails", Context.MODE_PRIVATE)
     val json = sharedPreferences.getString("kpi", null)
 
     return if (json != null) {
         try {
-            val list = Gson().fromJson(json, Array<KpiDetails>::class.java)?.toList()
-            list?.firstOrNull() // Return the first user object
+            Gson().fromJson(json, Array<KpiDetails>::class.java)?.toList()
+
         } catch (e: Exception) {
             null // Return null if any error occurs
         }
@@ -61,14 +61,13 @@ fun setSessionStatusDetails(context: Context, list: List<StatusDetails>?) {
     sharedPreferences.edit().putString("status", json).apply()
 }
 
-fun getSessionStatusDetails(context: Context): StatusDetails? {
+fun getSessionStatusDetails(context: Context): List<StatusDetails>? {
     val sharedPreferences = context.getSharedPreferences("StatusDetails", Context.MODE_PRIVATE)
     val json = sharedPreferences.getString("status", null)
 
-    return if (json != null) {
+    return if (!json.isNullOrEmpty()) {
         try {
-            val list = Gson().fromJson(json, Array<StatusDetails>::class.java)?.toList()
-            list?.firstOrNull() // Return the first user object
+            Gson().fromJson(json, Array<StatusDetails>::class.java)?.toList()
         } catch (e: Exception) {
             null // Return null if any error occurs
         }

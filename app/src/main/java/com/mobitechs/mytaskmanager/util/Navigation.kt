@@ -17,8 +17,9 @@ import com.mobitechs.mytaskmanager.screen.user.LoginScreen
 import com.mobitechs.mytaskmanager.screen.user.RegisterScreen
 import com.mobitechs.mytaskmanager.screen.user.SetPasswordScreen
 import com.mobitechs.mytaskmanager.screen.team.TeamAddScreen
-import com.mobitechs.mytaskmanager.screen.team.TeamDetailsScreen
 import com.mobitechs.mytaskmanager.screen.team.TeamListScreen
+import com.mobitechs.mytaskmanager.screen.team.TeamMemberDetailsScreen
+import com.mobitechs.mytaskmanager.screen.team.TeamWiseTaskDetails
 import com.mobitechs.mytaskmanager.viewModel.ViewModelUser
 
 @Composable
@@ -51,22 +52,37 @@ fun AppNavigation(viewModel: ViewModelUser) {
         }
 
 
+
+
         composable(
-            "teamDetailsScreen/{teamJson}",
+            "teamMemberDetailsScreen/{teamJson}",
+            arguments = listOf(navArgument("teamJson") {
+                type = NavType.StringType
+                defaultValue = "{}" // Use empty JSON instead of "null"
+            })
+        ) { backStackEntry ->
+            val teamJson = backStackEntry.arguments?.getString("teamJson")
+            TeamMemberDetailsScreen(navController, teamJson)
+        }
+
+
+
+        composable(
+            "teamWiseTaskDetails/{teamJson}",
             arguments = listOf(navArgument("teamJson") {
                 type = NavType.StringType
                 defaultValue = "null" // Handle null case
             })
         ) { backStackEntry ->
             val teamJson = backStackEntry.arguments?.getString("teamJson")
-            TeamDetailsScreen(navController, teamJson)
+            TeamWiseTaskDetails(navController, teamJson)
         }
 
         composable(
             "taskForMeDetailsScreen/{taskJson}",
             arguments = listOf(navArgument("taskJson") {
                 type = NavType.StringType
-                defaultValue = "null" // Handle null case
+                defaultValue = "{}" // Handle null case
             })
         ) { backStackEntry ->
             val taskJson = backStackEntry.arguments?.getString("taskJson")

@@ -36,15 +36,17 @@ import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.DatePickerButton
 import com.mobitechs.mytaskmanager.components.DropdownField
+import com.mobitechs.mytaskmanager.model.KpiDetails
 import com.mobitechs.mytaskmanager.model.MyData
+import com.mobitechs.mytaskmanager.model.StatusDetails
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.model.TaskRequestAddEdit
 import com.mobitechs.mytaskmanager.model.TeamDetails
 import com.mobitechs.mytaskmanager.model.UserData
 import com.mobitechs.mytaskmanager.util.ShowToast
-import com.mobitechs.mytaskmanager.util.formatDateTime
+import com.mobitechs.mytaskmanager.util.getSessionKpiDetails
+import com.mobitechs.mytaskmanager.util.getSessionStatusDetails
 import com.mobitechs.mytaskmanager.util.getUserFromSession
-import com.mobitechs.mytaskmanager.util.statusOptions
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
@@ -72,7 +74,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 kpiName = "",
                 noOfReminder = "",
                 comment = "",
-                assigneeId="",
+                assigneeId = "",
                 assigneeName = "",
                 assigneeEmail = "",
                 assigneePhone = "",
@@ -90,22 +92,34 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
 
     var taskName by remember { mutableStateOf(taskDetails.value.taskName) }
     var taskDescription by remember { mutableStateOf(taskDetails.value.taskDescription) }
-    var kpi by remember { mutableStateOf(taskDetails.value.kpiName) }
+//    var kpi by remember { mutableStateOf(taskDetails.value.kpiName) }
     var selectedTeamId by remember { mutableStateOf(taskDetails.value.teamId) }
     var selectedTeamName by remember { mutableStateOf(taskDetails.value.teamName) }
     var selectedAssigneeId by remember { mutableStateOf(taskDetails.value.assigneeId) }
     var selectedAssigneeName by remember { mutableStateOf(taskDetails.value.assigneeName) }
     var expectedDate by remember { mutableStateOf(taskDetails.value.expectedDate) }
-    var status by remember { mutableStateOf(taskDetails.value.statusName) }
+
+    var statusList by remember { mutableStateOf<List<StatusDetails>>(emptyList()) }
+    statusList = getSessionStatusDetails(context)!!
+    var selectedStatusId by remember { mutableStateOf(taskDetails.value.statusId) }
+    var statusName by remember { mutableStateOf(taskDetails.value.statusName) }
+
+
+    var kpiList by remember { mutableStateOf<List<KpiDetails>>(emptyList()) }
+    kpiList = getSessionKpiDetails(context)!!
+    var selectedKpiId by remember { mutableStateOf(taskDetails.value.kpiId) }
+    var kpiName by remember { mutableStateOf(taskDetails.value.kpiName) }
 
     var isLoading by remember { mutableStateOf(true) }
     var teams by remember { mutableStateOf<List<TeamDetails>>(emptyList()) }
     var users by remember { mutableStateOf<List<UserData>>(emptyList()) }
 
+
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
+
 
     LaunchedEffect(Unit) {
         viewModel.getUserList(MyData(userId)) { response ->
@@ -171,13 +185,26 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = kpi,
-                onValueChange = { kpi = it },
-                label = { Text("KPI") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+//            OutlinedTextField(
+//                value = kpi,
+//                onValueChange = { kpi = it },
+//                label = { Text("KPI") },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+//            )
+            DropdownField(
+                label = "Select KPI",
+                options = kpiList.map { it.kpiName },
+                selectedOption = kpiName,
+                onOptionSelected = { selectedName ->
+                    kpiName = selectedName
+                    selectedKpiId =
+                        (kpiList.firstOrNull { it.kpiName == selectedName }?.kpiId
+                            ?: "").toString()
+                },
+                context = context
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             DropdownField(
@@ -224,18 +251,15 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             DropdownField(
                 label = "Status",
-//                        options = statusOptions.map { it.id.toString() to it.name },
-                options = statusOptions.map { it.name },
-                selectedOption = status,
+                options = statusList.map { it.statusName },
+                selectedOption = statusName,
                 onOptionSelected = { selectedName ->
-                    status = selectedName
-//                            if you want id then uncomment this code and also do this
-//                            selectedCategoryId =
-//                                (categoryList.firstOrNull { it.categoryName == selectedName }?.categoryId
-//                                    ?: "").toString()
+                    statusName = selectedName
+                    selectedStatusId =
+                        (statusList.firstOrNull { it.statusName == selectedName }?.statusId
+                            ?: "").toString()
                 },
                 context = context
             )
@@ -260,12 +284,12 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                                         taskDetails.value.taskId,
                                         taskName,
                                         taskDescription,
-                                        kpi,
+                                        selectedKpiId,
                                         userId,
                                         selectedAssigneeId,
                                         selectedTeamId,
                                         expectedDate,
-                                        status,
+                                        selectedStatusId,
                                         userId
                                     )
                                 ) { response ->
@@ -290,12 +314,12 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                                         "",
                                         taskName,
                                         taskDescription,
-                                        kpi,
+                                        selectedKpiId,
                                         userId,
                                         selectedAssigneeId,
                                         selectedTeamId,
                                         expectedDate,
-                                        status,
+                                        selectedStatusId,
                                         userId
                                     )
                                 ) { response ->
@@ -323,7 +347,6 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
             }
         }
     }
-
 
 
 }

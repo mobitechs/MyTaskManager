@@ -47,14 +47,15 @@ import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.mobitechs.mytaskmanager.components.DatePickerButton
 import com.mobitechs.mytaskmanager.components.DropdownField
+import com.mobitechs.mytaskmanager.model.StatusDetails
 import com.mobitechs.mytaskmanager.model.TaskDetails
 import com.mobitechs.mytaskmanager.model.TaskRequestUpdate
 import com.mobitechs.mytaskmanager.model.TaskStatus
 import com.mobitechs.mytaskmanager.util.Constant
 import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.formatDateTime
+import com.mobitechs.mytaskmanager.util.getSessionStatusDetails
 import com.mobitechs.mytaskmanager.util.getUserFromSession
-import com.mobitechs.mytaskmanager.util.statusOptions
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 
 @Composable
@@ -63,7 +64,12 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
     val viewModel: ViewModelTask = viewModel()
 
     val task = remember { Gson().fromJson(taskJson, TaskDetails::class.java) }
+
+    var statusList by remember { mutableStateOf<List<StatusDetails>>(emptyList()) }
+    statusList = getSessionStatusDetails(context)!!
+
     var selectedStatus by remember { mutableStateOf(task.statusName) }
+    var selectedStatusId by remember { mutableStateOf(task.statusId) }
     var selectedDeadlineDate by remember { mutableStateOf(task.deadlineDate) }
     var commentText by remember { mutableStateOf(task.comment) }
 
@@ -115,6 +121,7 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
                     TaskDetailRow(Icons.Default.Notifications, "Reminders", task.noOfReminder)
                     TaskDetailRow(Icons.Default.CalendarMonth, "Created at", formatDateTime(task.createdAt))
                     TaskDetailRow(Icons.Default.CalendarMonth, "Expected Date", formatDateTime(task.expectedDate))
+                    TaskDetailRow(Icons.Default.CalendarMonth, "Deadline", formatDateTime(task.deadlineDate))
                     TaskDetailRow(Icons.Default.Person, "Assigned By", task.ownerName)
                     //TaskDetailRow(Icons.Default.Group, "Team", task.teamName)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -141,14 +148,14 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
                     DropdownField(
                         label = "",
 //                        options = statusOptions.map { it.id.toString() to it.name },
-                        options = statusOptions.map { it.name },
+                        options = statusList.map { it.statusName },
                         selectedOption = selectedStatus,
                         onOptionSelected = { selectedName ->
                             selectedStatus = selectedName
 //                            if you want id then uncomment this code and also do this
-//                            selectedCategoryId =
-//                                (categoryList.firstOrNull { it.categoryName == selectedName }?.categoryId
-//                                    ?: "").toString()
+                            selectedStatusId =
+                                (statusList.firstOrNull { it.statusName == selectedName }?.statusId
+                                    ?: "").toString()
                         },
                         context = context
                     )
@@ -179,7 +186,7 @@ fun TaskForMeDetailsScreen(navController: NavController, taskJson: String?) {
                                 viewModel.updateTaskDetails(
                                     TaskRequestUpdate(
                                         task.taskId,
-                                        selectedStatus,
+                                        selectedStatusId,
                                         commentText,
                                         selectedDeadlineDate,
                                         userId

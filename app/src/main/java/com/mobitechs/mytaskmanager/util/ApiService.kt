@@ -72,6 +72,9 @@ interface ApiService {
     @POST("getUserList")
     suspend fun getUserList(@Body team: MyData): ApiResponse
 
+    @POST("getTeamWiseTaskDetails")
+    suspend fun getTeamWiseTaskDetails(@Body team: MyTeamData): TaskResponse
+
 
 // task Details
 
@@ -80,6 +83,7 @@ interface ApiService {
 
     @POST("getTaskListAssignedByMe")
     suspend fun getTaskListAssignedByMe(@Body team: MyData): TaskResponse
+
 
     @POST("addTask")
     suspend fun addTask(@Body task: TaskRequestAddEdit): ApiResponse

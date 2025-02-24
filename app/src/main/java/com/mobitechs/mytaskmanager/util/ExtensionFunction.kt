@@ -43,15 +43,6 @@ import java.util.Locale
 
 
 
-val statusOptions = listOf(
-    TaskStatus(1, "To Do"),
-    TaskStatus(2, "Reopened"),
-    TaskStatus(3, "WIP"),
-    TaskStatus(4, "Completed"),
-    TaskStatus(5, "Cancelled")
-)
-
-
 
 fun handleHttpException(e: HttpException): ApiResponse {
     val errorBody = e.response()?.errorBody()?.string()

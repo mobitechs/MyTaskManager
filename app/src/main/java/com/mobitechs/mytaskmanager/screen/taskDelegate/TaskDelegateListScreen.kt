@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -336,8 +337,11 @@ fun TaskCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+//                navController.navigate("taskAddScreen/${Gson().toJson(task)}")
+                navController.navigate( "taskAddScreen/${Uri.encode(Gson().toJson(task))}")
+            }
             .padding(8.dp),
-//            .clickable { navController.navigate("taskDetailsScreen/${Gson().toJson(task)}") }
         elevation = 4.dp,
         border = BorderStroke(1.dp, statusColor),
 
@@ -347,6 +351,7 @@ fun TaskCard(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
+                Text("Expected Date: ${task.expectedDate}", fontSize = 12.sp, color = Color.Red)
                 Text("Deadline: ${task.deadlineDate}", fontSize = 12.sp, color = Color.Red)
 //            Text("Deadline: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
                 // Row for Status, Assigned To, Team Name & Buttons
@@ -368,7 +373,8 @@ fun TaskCard(
                     Row {
                         // 🖊 Edit Button
                         IconButton(onClick = {
-                            navController.navigate("taskAddScreen/${Gson().toJson(task)}")
+//                            navController.navigate("taskAddScreen/${Gson().toJson(task)}")
+                            navController.navigate( "taskAddScreen/${Uri.encode(Gson().toJson(task))}")
                         }) {
                             Icon(
                                 Icons.Default.Edit,

@@ -59,7 +59,7 @@ import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTeam
 
 @Composable
-fun TeamDetailsScreen(navController: NavController, teamJson: String?) {
+fun TeamMemberDetailsScreen(navController: NavController, teamJson: String?) {
     val context = LocalContext.current
     val viewModel: ViewModelTeam = viewModel()
     val team = remember { mutableStateOf(Gson().fromJson(teamJson, TeamDetails::class.java)) }

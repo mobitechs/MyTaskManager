@@ -147,7 +147,7 @@ fun TeamListScreen(navController: NavController) {
                                     .padding(8.dp)
                                     .clickable {
                                         navController.navigate(
-                                            "teamDetailsScreen/${
+                                            "teamWiseTaskDetails/${
                                                 Gson().toJson(
                                                     team
                                                 )
