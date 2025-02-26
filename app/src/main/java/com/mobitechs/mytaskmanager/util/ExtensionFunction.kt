@@ -1,7 +1,9 @@
 package com.mobitechs.mytaskmanager.util
 
 import android.app.DatePickerDialog
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -40,8 +42,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
-
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 
 fun handleHttpException(e: HttpException): ApiResponse {
@@ -162,3 +169,33 @@ fun formatDateTime(inputDateTime: String): String {
 }
 
 
+
+fun createRequestBody(value: String): RequestBody {
+    return RequestBody.create("text/plain".toMediaTypeOrNull(), value)
+}
+
+fun createMultipartBody(fileUri: Uri?, context: Context): MultipartBody.Part? {
+    fileUri?.let {
+        val file = File(fileUri.path!!)
+        val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+        return MultipartBody.Part.createFormData("profileImage", file.name, requestFile) // ✅ Use correct name
+    }
+    return null
+}
+
+fun getFileFromUri(context: Context, uri: Uri): File? {
+    val contentResolver: ContentResolver = context.contentResolver
+    val inputStream: InputStream? = contentResolver.openInputStream(uri)
+
+    inputStream?.let {
+        val file = File(context.cacheDir, "profile_image.jpg")
+        val outputStream = FileOutputStream(file)
+
+        it.copyTo(outputStream)
+        it.close()
+        outputStream.close()
+
+        return file
+    }
+    return null
+}
