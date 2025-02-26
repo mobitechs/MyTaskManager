@@ -85,7 +85,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                 taskDescription = "",
                 expectedDate = "",
                 deadlineDate = "",
-                statusId = "To Do",
+                statusId = "1",
                 statusName = "To Do",
                 kpiId = "",
                 kpiName = "",
@@ -154,23 +154,6 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
 
     tts.language = Locale.US
 
-    fun startSpeech() {
-
-        if (permissionGranted) {
-            isSpeaking = true
-            ShowToast(context,"Start Speech")
-            tts.speak(taskDescription, TextToSpeech.QUEUE_FLUSH, null, null)
-
-        }
-    }
-    fun stopSpeech() {
-
-        ShowToast(context,"stop Speech")
-        if (tts.isSpeaking) {
-            tts.stop()
-            isSpeaking = false
-        }
-    }
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -332,6 +315,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                     selectedKpiId =
                         (kpiList.firstOrNull { it.kpiName == selectedName }?.kpiId
                             ?: "").toString()
+                   // ShowToast(context,"KPI: $selectedKpiId")
                 },
                 context = context
             )
@@ -383,7 +367,7 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
             Spacer(modifier = Modifier.height(16.dp))
 
             DropdownField(
-                label = "Status",
+                label = "Select Status",
                 options = statusList.map { it.statusName },
                 selectedOption = statusName,
                 onOptionSelected = { selectedName ->
@@ -391,6 +375,8 @@ fun TaskAddScreen(navController: NavController, taskJson: String?) {
                     selectedStatusId =
                         (statusList.firstOrNull { it.statusName == selectedName }?.statusId
                             ?: "").toString()
+
+                  //  ShowToast(context,"status: $selectedStatusId")
                 },
                 context = context
             )

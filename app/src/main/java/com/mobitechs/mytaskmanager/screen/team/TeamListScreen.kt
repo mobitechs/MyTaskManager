@@ -90,7 +90,7 @@ fun TeamListScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Team") },
+                title = { Text("All Teams") },
 //                navigationIcon = {
 //                    IconButton(onClick = { navController.popBackStack() }) {
 //                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

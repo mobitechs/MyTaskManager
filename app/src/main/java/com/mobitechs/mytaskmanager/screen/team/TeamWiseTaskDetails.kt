@@ -86,6 +86,7 @@ fun TeamWiseTaskDetails(navController: NavController, teamJson: String?) {
 
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
+    val isEnabler = user.value?.isEnabler.toString()
 
 
     LaunchedEffect(refreshAPITrigger) {
@@ -122,16 +123,13 @@ fun TeamWiseTaskDetails(navController: NavController, teamJson: String?) {
         },
 
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(
-                    "teamDetailsScreen/${
-                        Gson().toJson(
-                            team
-                        )
-                    }"
-                ) },
-                shape = CircleShape
-            ) { Icon(Icons.Default.Add, contentDescription = "Add Task") }
+            if(isEnabler=="1"){
+                FloatingActionButton(
+                    onClick = { navController.navigate("taskAddScreen/${Uri.encode("null")}")  },
+                    shape = CircleShape
+                ) { Icon(Icons.Default.Add, contentDescription = "Add Task") }
+            }
+
         }
     ) { paddingValues ->
         Column(

@@ -353,7 +353,7 @@ fun TaskCard(
                 Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
                 Text("Expected Date: ${task.expectedDate}", fontSize = 12.sp, color = Color.Red)
                 Text("Deadline: ${task.deadlineDate}", fontSize = 12.sp, color = Color.Red)
-//            Text("Deadline: ${formatDateTime(task.expectedDate)}", fontSize = 12.sp, color = Color.Red)
+//            Text("Deadline: ${task.expectedDate}", fontSize = 12.sp, color = Color.Red)
                 // Row for Status, Assigned To, Team Name & Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
