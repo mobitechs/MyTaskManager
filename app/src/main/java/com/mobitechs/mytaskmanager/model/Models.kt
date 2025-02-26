@@ -1,5 +1,8 @@
 package com.mobitechs.mytaskmanager.model
 
+
+data class MenuItem(val title: String, val icon: Int, val route: String)
+
 data class UserRequest(val name: String, val email: String, val phone: String, val password: String)
 data class LoginRequest(val loginId: String, val password: String)
 data class SetPasswordRequest(val email: String, val otp: String, val password: String)
