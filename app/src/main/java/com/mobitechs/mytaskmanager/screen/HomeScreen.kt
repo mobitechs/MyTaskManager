@@ -63,11 +63,22 @@ import com.mobitechs.mytaskmanager.viewModel.ViewModelHome
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
+import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.em
 import coil3.compose.rememberAsyncImagePainter
 import com.mobitechs.mytaskmanager.BuildConfig
+import com.mobitechs.mytaskmanager.components.setStatusIcon
 import com.mobitechs.mytaskmanager.util.Constant
+import com.mobitechs.mytaskmanager.util.clearUserSession
 
 
 @Composable
@@ -183,11 +194,19 @@ fun HomeScreen(navController: NavController) {
                 }
 
                 else -> {
+
+                    val totalAssignedByMeList = assignedByMeList.sumOf { it.totalCount }
+                    val totalAssignedToMeList = assignedToMeList.sumOf { it.totalCount }
                     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                         item {
-                            TaskBox("Tasks Assigned By Me", assignedByMeList, navController)
+
+                            SectionTitle(text = "Tasks assigned by me:  ($totalAssignedByMeList)")
+                            TaskStatusGrid2(assignedByMeList)
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            TaskBox("Tasks Assigned To Me", assignedToMeList, navController)
+                            SectionTitle(text = "Tasks assigned to me:  ($totalAssignedToMeList)")
+                            TaskStatusGrid2(assignedToMeList)
+
                         }
                     }
                 }
@@ -196,49 +215,100 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-
 @Composable
-fun TaskBox(title: String, taskList: List<TaskStatusWiseCountDetails>, navController: NavController) {
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = 6.dp,
-        backgroundColor = Color.White
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Spacer(modifier = Modifier.height(8.dp))
-            Column {
-                taskList.forEach { task ->
-                    TaskStatusItem(task, navController)
+fun TaskStatusGrid2(items: List<TaskStatusWiseCountDetails>) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        // Calculate number of rows needed based on 2 items per row
+        val rows = (items.size + 1) / 2
+
+        for (i in 0 until rows) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                for (j in 0 until 2) {
+                    val index = i * 2 + j
+                    if (index < items.size) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            TaskStatusCard2(
+                                title = items[index].statusName,
+                                count = items[index].totalCount.toString(),
+
+                                )
+                        }
+                    } else {
+                        // Empty space to maintain grid alignment
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }
     }
 }
+@Composable
+fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = (-0.015).em,
+        color = Color(0xFF101618),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+    )
+}
 
 @Composable
-fun TaskStatusItem(task: TaskStatusWiseCountDetails, navController: NavController) {
-    var statusColor = setStatusColor(task.statusName)
+fun TaskStatusCard2(title: String, count: String) {
+    val statusColor = setStatusColor(title)  // Get the color based on status
+    val icon: Painter = setStatusIcon(title) // Get the icon based on status
 
-    Card(
+    androidx.compose.material3.Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp) // Reduced padding for a refined look
-            .clickable {
-//                navController.navigate("taskDetailsScreen/${task.statusId}")
-            },
-        shape = RoundedCornerShape(8.dp),
-        elevation = 2.dp, // Subtle elevation
-        border = BorderStroke(1.dp, statusColor), // Dark outline
-//        backgroundColor = statusColor.copy(alpha = 0.1f) // Lighter background shade
+            .aspectRatio(1.6f)
+            .border(
+                width = 1.dp,
+                color = statusColor,  // Use status color for border
+                shape = RoundedCornerShape(8.dp)
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp
+        ),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(task.statusName, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = statusColor)
-            Text("Count: ${task.totalCount}", fontSize = 16.sp, color = Color.Black)
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Icon with status color as tint
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = statusColor,  // Use status color here
+                modifier = Modifier.size(24.dp)
+            )
+
+            // Text with status color
+            Text(
+                text = "$title: $count",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = statusColor, // Use status color here
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
+
+
+
 @Composable
 fun DrawerMenuItem(item: MenuItem, navController: NavController) {
     Row(
@@ -328,6 +398,7 @@ fun DrawerContent(navController: NavController, context: Context) {
         ) {
             Button(
                 onClick = {
+                    clearUserSession(context)
                     ShowToast(context, "Logged out successfully")
                     navController.navigate("loginScreen")
                 },
