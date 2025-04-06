@@ -35,10 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.mobitechs.mytaskmanager.R
+import com.mobitechs.mytaskmanager.ui.theme.primaryColor
+import com.mobitechs.mytaskmanager.ui.theme.redColor
 import com.mobitechs.mytaskmanager.util.ShowDatePicker
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -230,10 +235,21 @@ fun ConfirmationDialog(
 fun setStatusColor(statusName:String): Color {
     val statusColor = when (statusName) {
         "Completed" -> Color(0xFF4CAF50) // Green
-        "WIP" -> Color(0xFFFFEB3B) // Yellow
+        "WIP" -> Color(0xFFFFC107) // Yellow
         "Reopened" -> Color(0xFFF44336) // Red
         "To Do" -> Color(0xFFF44336) // Red
         else -> Color.Gray
     }
     return statusColor
+}
+@Composable
+fun setStatusIcon(statusName: String): Painter {
+    val iconRes = when (statusName) {
+        "Completed" -> R.drawable.round_done_all_24  // Example: Green check icon
+        "WIP" -> R.drawable.baseline_rule_24  // Example: Hourglass icon
+        "Reopened" -> R.drawable.baseline_menu_open_24  // Example: Refresh icon
+        "To Do" -> R.drawable.baseline_format_list_numbered_24  // Example: Assignment icon
+        else -> R.drawable.baseline_format_list_numbered_24  // Default icon
+    }
+    return painterResource(id = iconRes)
 }

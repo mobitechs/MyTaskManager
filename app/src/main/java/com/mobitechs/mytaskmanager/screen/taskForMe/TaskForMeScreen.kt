@@ -1,14 +1,13 @@
 package com.mobitechs.mytaskmanager.screen.taskForMe
 
-
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -32,10 +32,16 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,7 +63,12 @@ import com.mobitechs.mytaskmanager.components.BottomNavigationBar
 import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
-import com.mobitechs.mytaskmanager.util.formatDateTime
+import com.mobitechs.mytaskmanager.model.TaskRequestDelete
+import com.mobitechs.mytaskmanager.ui.theme.accentColor
+import com.mobitechs.mytaskmanager.ui.theme.primaryTextColor
+import com.mobitechs.mytaskmanager.ui.theme.redColor
+import com.mobitechs.mytaskmanager.ui.theme.surfaceColor
+import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 import java.text.SimpleDateFormat
@@ -67,15 +78,18 @@ import java.util.Locale
 
 @Composable
 fun TaskForMeScreen(navController: NavController) {
+
+
     val context = LocalContext.current
     val viewModel: ViewModelTask = viewModel()
+
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var refreshAPITrigger by remember { mutableStateOf(0) }
 
-
     var taskList by remember { mutableStateOf<List<TaskDetails>>(emptyList()) }
     var filteredTasks by remember { mutableStateOf(taskList) }
+
     var selectedTeam by remember { mutableStateOf("All") }
     var selectedStatus by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
@@ -85,7 +99,7 @@ fun TaskForMeScreen(navController: NavController) {
     val user = remember { mutableStateOf(getUserFromSession(context)) }
     val userId = user.value?.userId.toString()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshAPITrigger) {
         viewModel.getTaskListAssignedToMe(MyData(userId)) { response ->
             isLoading = false
             response?.let {
@@ -145,7 +159,7 @@ fun TaskForMeScreen(navController: NavController) {
         },
         bottomBar = { BottomNavigationBar(navController) },
 
-        ) { paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -170,6 +184,7 @@ fun TaskForMeScreen(navController: NavController) {
                 }
             )
 
+
             // Team Filter Section
             val teamCounts = taskList.groupingBy { it.ownerTeamName }.eachCount()
             val allCount = taskList.size
@@ -177,7 +192,7 @@ fun TaskForMeScreen(navController: NavController) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(top = 4.dp, bottom = 0.dp, start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
@@ -202,10 +217,7 @@ fun TaskForMeScreen(navController: NavController) {
                 }
             }
 
-            TaskSummaryCard(
-                filteredTasks,
-                selectedTeam
-            )
+//            TaskSummaryCard(filteredTasks, selectedTeam)
 
             TaskListView(
                 navController,
@@ -217,7 +229,6 @@ fun TaskForMeScreen(navController: NavController) {
         }
     }
 }
-
 
 // Search Bar with Date Filter
 @Composable
@@ -233,7 +244,7 @@ fun SearchBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -280,16 +291,24 @@ fun showDatePicker(context: Context, onDateSelected: (String) -> Unit) {
 // Custom Chip for Teams
 @Composable
 fun TeamChip(ownerTeamName: String, isSelected: Boolean, onClick: (String) -> Unit) {
-    Button(
-        onClick = { onClick(ownerTeamName) },
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) Color.Blue else Color.Gray,
-            contentColor = Color.White
-        ),
-        shape = CircleShape,
-        modifier = Modifier.padding(4.dp)
+
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) accentColor else surfaceColor,
+        modifier = Modifier.height(32.dp),
+        onClick = { onClick(ownerTeamName) }
     ) {
-        Text(ownerTeamName, fontSize = 12.sp)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = ownerTeamName,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF101618)
+            )
+        }
     }
 }
 
@@ -306,13 +325,14 @@ fun TaskListView(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(16.dp)
     ) {
         items(tasks) { task ->
             TaskCard(task, navController, viewModel, userId, context, refreshList)
         }
     }
 }
+
 
 @Composable
 fun TaskCard(
@@ -323,18 +343,57 @@ fun TaskCard(
     context: Context,
     refreshList: () -> Unit
 ) {
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var statusColor = setStatusColor(task.statusName)
-    Card(
+
+
+    androidx.compose.material3.Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                navController.navigate( "taskForMeDetailsScreen/${Uri.encode(Gson().toJson(task))}")
+            .border(
+                width = 1.dp,
+                color = statusColor,  // Use status color for border
+                shape = RoundedCornerShape(8.dp)
+            ),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
 
-            },
-        elevation = 4.dp,
-        border = BorderStroke(1.dp, statusColor),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(2f)
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = task.taskName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF101618)
+                    )
+
+                    Text(
+                        text = "Expected Date: ${task.expectedDate}",
+                        fontSize = 14.sp,
+                        color = Color(0xFF5E7F8D)
+                    )
+                    Text(
+                        text = "Assigned By: : ${task.ownerTeamName} - ${task.ownerName}",
+                        fontSize = 14.sp,
+                        color = Color(0xFF5E7F8D)
+                    )
+                }
         Column(modifier = Modifier.background(statusColor.copy(alpha = 0.1f))) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -347,73 +406,56 @@ fun TaskCard(
                 )
                 Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
 
-
-                // Row for Status, Assigned To, Team Name & Buttons
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "Assigned by: ${task.ownerName}",
-                            fontSize = 12.sp,
-                            color = Color.Black
-                        )
-                        Text("Team: ${task.ownerTeamName}", fontSize = 12.sp, color = Color.Magenta)
-                    }
-
-                    Row {
-                        // 🖊 Edit Button
-                        IconButton(onClick = {
+                    verticalAlignment = Alignment.Bottom
+                ){
+                    Button(
+                        onClick = {
                             navController.navigate( "taskForMeDetailsScreen/${Uri.encode(Gson().toJson(task))}")
-                        }) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Edit Task",
-                                tint = Color.Blue
-                            )
-                        }
+                        },
 
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFF0F3F5),
+                            contentColor = Color(0xFF101618)
+                        ),
+                        contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .height(32.dp)
+                    ) {
+                        Text(
+                            text = "View details",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
+                    Text(
+                        text = "Status: ${task.statusName}",
+                        fontSize = 14.sp,
+                        color = statusColor
+                    )
                 }
 
+
             }
+
+
         }
     }
 
+
 }
 
-
-@Composable
-fun TaskSummaryCard(taskList: List<TaskDetails>, selectedTeam: String) {
-    val statusCounts = taskList.groupingBy { it.statusName }.eachCount()
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-//        shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp,
-        backgroundColor = Color.White
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                "$selectedTeam Task Summary",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            statusCounts.forEach { (status, count) ->
-                var statusColor = setStatusColor(status)
-                Text(
-                    "$status: $count",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = statusColor
-                )
-            }
-        }
-    }
-}

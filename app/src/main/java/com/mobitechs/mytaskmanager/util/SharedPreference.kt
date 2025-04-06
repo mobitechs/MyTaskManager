@@ -7,6 +7,12 @@ import com.mobitechs.mytaskmanager.model.StatusDetails
 import com.mobitechs.mytaskmanager.model.UserData
 
 
+
+fun clearUserSession(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+    sharedPreferences.edit().clear().apply()
+}
+
 fun sessionUserObject(context: Context, userData: List<UserData>?) {
     val sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
     val userJson = Gson().toJson(userData)
