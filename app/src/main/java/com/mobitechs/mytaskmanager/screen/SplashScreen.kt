@@ -39,7 +39,7 @@ fun SplashScreen(navController: NavController) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            "Don't Worry, I'm here to manage your Task",
+            "Don't Worry, I'm here to manage your Task ",
             fontSize = 32.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
