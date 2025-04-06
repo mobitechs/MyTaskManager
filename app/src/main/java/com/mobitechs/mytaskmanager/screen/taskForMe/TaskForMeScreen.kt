@@ -3,6 +3,7 @@ package com.mobitechs.mytaskmanager.screen.taskForMe
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -32,10 +31,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -63,12 +60,8 @@ import com.mobitechs.mytaskmanager.components.BottomNavigationBar
 import com.mobitechs.mytaskmanager.components.setStatusColor
 import com.mobitechs.mytaskmanager.model.MyData
 import com.mobitechs.mytaskmanager.model.TaskDetails
-import com.mobitechs.mytaskmanager.model.TaskRequestDelete
 import com.mobitechs.mytaskmanager.ui.theme.accentColor
-import com.mobitechs.mytaskmanager.ui.theme.primaryTextColor
-import com.mobitechs.mytaskmanager.ui.theme.redColor
 import com.mobitechs.mytaskmanager.ui.theme.surfaceColor
-import com.mobitechs.mytaskmanager.util.ShowToast
 import com.mobitechs.mytaskmanager.util.getUserFromSession
 import com.mobitechs.mytaskmanager.viewModel.ViewModelTask
 import java.text.SimpleDateFormat
@@ -159,7 +152,7 @@ fun TaskForMeScreen(navController: NavController) {
         },
         bottomBar = { BottomNavigationBar(navController) },
 
-    ) { paddingValues ->
+        ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -382,6 +375,7 @@ fun TaskCard(
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF101618)
                     )
+                    Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
 
                     Text(
                         text = "Expected Date: ${task.expectedDate}",
@@ -393,69 +387,13 @@ fun TaskCard(
                         fontSize = 14.sp,
                         color = Color(0xFF5E7F8D)
                     )
+
+                    Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
                 }
-        Column(modifier = Modifier.background(statusColor.copy(alpha = 0.1f))) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
-                Text(
-//                    "Expected: ${formatDateTime(task.expectedDate)}",
-                    "Expected: ${task.expectedDate}",
-                    fontSize = 12.sp,
-                    color = Color.Red
-                )
-                Text("Status: ${task.statusName}", fontSize = 12.sp, color = Color.Blue)
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ){
-                    Button(
-                        onClick = {
-                            navController.navigate( "taskForMeDetailsScreen/${Uri.encode(Gson().toJson(task))}")
-                        },
-
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFF0F3F5),
-                            contentColor = Color(0xFF101618)
-                        ),
-                        contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .height(32.dp)
-                    ) {
-                        Text(
-                            text = "View details",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                    Text(
-                        text = "Status: ${task.statusName}",
-                        fontSize = 14.sp,
-                        color = statusColor
-                    )
-                }
-
-
+//
             }
 
 
         }
     }
-
-
 }
-
