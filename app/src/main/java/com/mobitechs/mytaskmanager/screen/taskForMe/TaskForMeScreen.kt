@@ -340,7 +340,8 @@ fun TaskCard(
                 Text(task.taskName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(task.taskDescription, fontSize = 14.sp, color = Color.DarkGray)
                 Text(
-                    "Expected: ${formatDateTime(task.expectedDate)}",
+//                    "Expected: ${formatDateTime(task.expectedDate)}",
+                    "Expected: ${task.expectedDate}",
                     fontSize = 12.sp,
                     color = Color.Red
                 )
